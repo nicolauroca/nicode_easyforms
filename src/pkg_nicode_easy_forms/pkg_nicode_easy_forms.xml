@@ -2,7 +2,7 @@
 <extension type="package" method="upgrade">
   <name>pkg_nicode_easy_forms</name>
   <packagename>nicode_easy_forms</packagename>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <author>Nicode</author>
   <creationDate>2026-09</creationDate>
   <license>GPL-2.0-or-later</license>

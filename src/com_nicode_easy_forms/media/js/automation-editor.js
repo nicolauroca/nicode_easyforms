@@ -1,3 +1,4 @@
+import {mountEmailEditor} from './email-editor.js';
 /** Visual, typed condition/effect and action authoring; no executable configuration. */
 import {configurationObject} from './builder-model.js';
 import {mountEmailTemplatePicker} from './templates.js';
@@ -127,6 +128,7 @@ export function mountAutomationEditor(root, {draft, providers, changed, node, bu
       action.config ??= {};
       if (['email_notification', 'email_autoresponse'].includes(action.type)) mountEmailTemplatePicker(card, {root, draft, action, formId, isDirty, changed, redraw});
       for (const [key, schema] of Object.entries(providers.actions[action.type]?.configuration_schema?.properties ?? {})) {
+        if (['email_notification', 'email_autoresponse'].includes(action.type) && ['subject','body_text','body_html','email_format'].includes(key)) continue;
         if (schema.attachment_fields) { mountAttachmentFields(card, action.config, draft.fields, {node, button, t, changed}); continue; }
         if (schema.type === 'object') { mapping(card, action.config, key); continue; }
         if (schema.row_selection) {
@@ -136,6 +138,7 @@ export function mountAutomationEditor(root, {draft, providers, changed, node, bu
         } else control(card, t(`action_${key}`), action.config, key, schema, {multiline: schema.multiline});
         if (schema.secret_reference) card.append(node('p', t('secret_reference_help')));
       }
+      if (['email_notification', 'email_autoresponse'].includes(action.type)) mountEmailEditor(card, {config:action.config, fields:draft.fields, node, button, control, t, changed});
       if (action.condition) {
         condition(card, action.condition, next => { action.condition = next; });
         card.append(button(t('remove_condition'), () => { delete action.condition; changed(); redraw(); }));

@@ -16,13 +16,13 @@ The runtime provides the capabilities.
 
 ## Project status
 
-> **1.0.3 — tabbed form editor**
+> **1.0.4 — tabbed form editor**
 
 Nicode EasyForms is being developed in public from day one.
 
 The architecture and product behaviour are defined through a comprehensive specification located in [`/docs`](./docs/README.md). Implementation is expected to follow those specifications rather than allowing the codebase to become the de facto product definition.
 
-Install [the 1.0.3 package](dist/pkg_nicode_easy_forms-1.0.3.zip) through Joomla's
+Install [the 1.0.4 package](dist/pkg_nicode_easy_forms-1.0.4.zip) through Joomla's
 extension installer. Read the [administration guide](docs/ADMIN_USER_GUIDE.md),
 [build instructions](docs/BUILD_AND_RELEASE.md) and
 [acceptance record](docs/REQUIREMENT_ACCEPTANCE.md). Accessibility was accepted

@@ -17,7 +17,7 @@ pestañas con el teclado; Intro o Espacio activa la seleccionada.
 
 Instale el ZIP del paquete desde el instalador de extensiones de Joomla 6. El
 paquete contiene componente, biblioteca, módulo y plugins de tareas y extensiones.
-La entrega 1.0.3 está en `dist/pkg_nicode_easy_forms-1.0.3.zip`; consulte
+La entrega 1.0.4 está en `dist/pkg_nicode_easy_forms-1.0.4.zip`; consulte
 [el estado y la aceptación](IMPLEMENTATION_STATUS.md).
 
 El resumen del instalador muestra la versión, el contenido del paquete, los próximos pasos y enlaces a documentación y soporte.
@@ -134,3 +134,14 @@ de purga; siga el flujo de revisión y espere la limpieza antes de desinstalar.
 
 Para construir paquetes y ejecutar verificaciones, consulte
 [Build and release](BUILD_AND_RELEASE.md) y [Testing guide](TESTING_GUIDE.md).
+
+
+## Composing notification and autoresponse emails
+
+In **Actions**, open an email notification or autoresponse. In **Email content**, choose **Send as: Plain text** or **HTML with a plain text alternative**. Existing configurations retain their previous delivery behavior until you change this selection. Switching to plain text preserves the stored HTML for later editing but does not send it.
+
+Write the subject and message. Place the cursor where an answer belongs, choose a **Form field**, and click **Insert selected field**. **Include field label** inserts the field name with its answer; clear it for just the answer. **Insert all answers** inserts a dynamic summary of all submitted fields allowed in email, including eligible fields added to the form later. Passwords and fields excluded from email remain excluded. Individual dropdown/choice insertions use their option labels. Repeated values retain the existing ordered representation. File attachments remain an explicit, separate selection.
+
+**Insert into** chooses the subject, plain text body or HTML body. The subject supports individual values; the multi-line all-answer summary is available only in message bodies. Inserted variables are replaced at delivery, so you never need to copy field UUIDs by hand.
+
+HTML mode provides paragraph, heading, bold and italic controls around selected content, an editable HTML body and an isolated layout preview. The preview displays placeholders, not real responses, and blocks scripts and external resources. Plain text content is escaped when first converted to HTML. Open **Plain text alternative** to supply a separate message for clients that cannot display HTML; leave it empty to generate one from the HTML at delivery. Submitted values are HTML-escaped during substitution. Save the draft and publish to activate the changes.

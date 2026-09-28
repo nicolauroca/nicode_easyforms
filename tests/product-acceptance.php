@@ -64,7 +64,7 @@ try {
     $draft['security']['captcha'] = ['mode' => 'provider', 'provider' => 'fixture-product-captcha']; $draft['security']['minimum_seconds'] = 0; $draft['persistence']['mode'] = 'full';
     $actions = ['internal' => Nicode\EasyForms\Domain\Uuid::create(), 'receipt' => Nicode\EasyForms\Domain\Uuid::create()];
     $draft['actions'] = [
-        ['uuid' => $actions['internal'], 'type' => 'email_notification', 'order' => 0, 'failure_policy' => 'non_blocking', 'config' => ['to' => ['team@example.test'], 'subject' => 'Internal {{submission.reference}}', 'body_text' => '{{response.summary}}']],
+        ['uuid' => $actions['internal'], 'type' => 'email_notification', 'order' => 0, 'failure_policy' => 'non_blocking', 'config' => ['to' => ['team@example.test'], 'subject' => 'Internal {{submission.reference}}', 'email_format' => 'html', 'body_text' => '', 'body_html' => '<h2>Answers</h2><pre>{{response.summary}}</pre>']],
         ['uuid' => $actions['receipt'], 'type' => 'email_autoresponse', 'order' => 1, 'failure_policy' => 'non_blocking', 'config' => ['email_field' => $fields['email'], 'subject' => 'Receipt {{submission.reference}}', 'body_text' => 'Thank you {{field.' . $fields['answer'] . '.value}}']],
     ];
     $draft['post_submit'] = ['behavior' => 'hide', 'messages' => ['success' => 'Product acceptance received {{submission.reference}}']];

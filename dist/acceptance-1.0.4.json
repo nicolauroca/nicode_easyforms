@@ -1,0 +1,29 @@
+{
+  "version": "1.0.4",
+  "sha256": "eae36b57e0e5bb724115f4e3e09d45c2f3155315c7e12cf05849a1268f57c51a",
+  "requirements_complete": 133,
+  "requirements_remaining": 0,
+  "php_tests": 299,
+  "javascript_tests": 171,
+  "product_steps": 40,
+  "native_web_update": true,
+  "native_admin_sections": 11,
+  "native_admin_details": 5,
+  "browser_checks": [
+    "saved notification and autoresponse composer",
+    "explicit HTML selection",
+    "insert selected field with label at cursor",
+    "insert all answers",
+    "sandboxed HTML layout preview",
+    "save and reload preserves format and content"
+  ],
+  "mail_checks": [
+    "plain text MIME",
+    "HTML multipart with generated plain alternative",
+    "legacy HTML compatibility",
+    "explicit text excludes stored HTML",
+    "field eligibility and escaped answer values",
+    "captured MIME only; no external delivery"
+  ],
+  "evidence": "docs/REQUIREMENT_ACCEPTANCE.md"
+}

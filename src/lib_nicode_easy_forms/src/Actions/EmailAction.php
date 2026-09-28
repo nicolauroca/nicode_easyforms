@@ -22,6 +22,7 @@ final readonly class EmailAction implements ActionInterface
             'reply_to_field' => ['type' => 'string', 'field_type' => 'email'], 'subject' => ['type' => 'string'],
             ...($this->autoresponse ? ['email_field_selection' => ['type' => 'string', 'enum' => self::ROW_SELECTIONS, 'row_selection' => true]] : []),
             'reply_to_field_selection' => ['type' => 'string', 'enum' => self::ROW_SELECTIONS, 'row_selection' => true],
+            'email_format' => ['type' => 'string', 'enum' => ['text', 'html']],
             'body_text' => ['type' => 'string', 'multiline' => true], 'body_html' => ['type' => 'string', 'multiline' => true],
             'attachment_fields' => ['type' => 'array', 'items' => ['type' => 'string'], 'maxItems' => 20, 'uniqueItems' => true, 'attachment_fields' => true],
         ]]];
@@ -29,6 +30,8 @@ final readonly class EmailAction implements ActionInterface
     public function validateConfiguration(array $configuration, string $path): array
     {
         $errors = [];
+        if (isset($configuration['email_format']) && !in_array($configuration['email_format'], ['text', 'html'], true)) { $errors[] = new Diagnostic('action.email_format', $path . '/email_format', 'Choose plain text or HTML.'); }
+        if (($configuration['email_format'] ?? null) === 'html' && (!is_string($configuration['body_html'] ?? null) || trim($configuration['body_html']) === '')) { $errors[] = new Diagnostic('action.body', $path . '/body_html', 'HTML content is required.'); }
         if (array_key_exists('attachment_fields', $configuration)) {
             $selection = $configuration['attachment_fields'];
             if (!is_array($selection) || !array_is_list($selection) || count($selection) > 20 || array_filter($selection, static fn($uuid): bool => !Uuid::valid($uuid)) !== [] || count(array_unique($selection)) !== count($selection)) {
@@ -48,7 +51,7 @@ final readonly class EmailAction implements ActionInterface
             foreach ($configuration[$key] ?? [] as $email) { if (!MailMessage::validAddress($email)) { $errors[] = new Diagnostic('action.address', "$path/$key", 'Invalid mail address.'); } }
         }
         if (!is_string($configuration['subject'] ?? null) || preg_match('/[\x00-\x1f\x7f]/', $configuration['subject'])) { $errors[] = new Diagnostic('action.subject', $path, 'A safe mail subject is required.'); }
-        if (!is_string($configuration['body_text'] ?? null)) { $errors[] = new Diagnostic('action.body', $path, 'Plain text body is required.'); }
+        if (!is_string($configuration['body_text'] ?? null) && !(($configuration['email_format'] ?? null) === 'html' && !isset($configuration['body_text']))) { $errors[] = new Diagnostic('action.body', $path, 'Plain text body is required.'); }
         if (isset($configuration['body_html']) && !is_string($configuration['body_html'])) { $errors[] = new Diagnostic('action.body', $path, 'HTML body must be text.'); }
         $pins = [];
         if (isset($configuration['template'])) { $pins[] = $configuration['template']; }
@@ -68,10 +71,16 @@ final readonly class EmailAction implements ActionInterface
             $tokens = $context->emailTokens();
             $recipient = $this->autoresponse ? [$this->emailField($configuration['email_field'], $context, $configuration['email_field_selection'] ?? null)] : $configuration['to'];
             $replyTo = isset($configuration['reply_to_field']) ? $this->emailField($configuration['reply_to_field'], $context, $configuration['reply_to_field_selection'] ?? null) : null;
+            $html = ($configuration['email_format'] ?? null) !== 'text' && ($configuration['body_html'] ?? '') !== '' ? $this->templates->render($configuration['body_html'], $tokens, 'html') : null;
+            $text = $this->templates->render($configuration['body_text'] ?? '', $tokens);
+            if ($text === '' && $html !== null) {
+                $plain = preg_replace('/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $html);
+                $plain = preg_replace('/<br\s*\/?\s*>|<\/(?:p|div|h[1-6]|li|tr|pre)>/i', "\n", $plain);
+                $text = trim(html_entity_decode(strip_tags($plain), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            }
             $message = new MailMessage($recipient, $configuration['cc'] ?? [], $configuration['bcc'] ?? [], $replyTo,
                 $this->templates->render($configuration['subject'], $tokens, 'header'),
-                $this->templates->render($configuration['body_text'], $tokens),
-                ($configuration['body_html'] ?? '') !== '' ? $this->templates->render($configuration['body_html'], $tokens, 'html') : null,
+                $text, $html,
                 attachments: $this->resolveAttachments($configuration['attachment_fields'] ?? [], $context));
         } catch (ActionFailure $failure) { throw $failure; }
         catch (\Throwable) { throw new ActionFailure('mail_preparation_failed'); }

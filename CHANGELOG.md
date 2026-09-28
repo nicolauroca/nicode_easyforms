@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4 - 2026-09-28
+
+- Add guided email composition to notifications and autoresponses: insert individual fields, labels or all answers at the cursor.
+- Offer explicit plain text / HTML delivery, formatting controls and an isolated HTML preview. Preserve saved templates and generate a plain text alternative when HTML has none.
+
+
 ## 1.0.3 - 2026-09-28
 
 - Fix incomplete editor initialization after upgrading: Joomla import maps version every JavaScript module by content, including transitive imports.

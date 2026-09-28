@@ -148,3 +148,24 @@ test('Joomla attachments compose actual MIME from bytes without opening file pat
     $transport->send(new Nicode\EasyForms\Actions\MailMessage(['to@example.test'],[],[],null,'Subject','No attachment'));
     same([],$factory->messages[array_key_last($factory->messages)]->getAttachments());
 });
+
+
+test('guided email tokens deliver selected fields and full summaries as plain or multipart MIME', function (): void {
+    $draft = definition(); $draft['fields'][0]['type']='email'; $field=$draft['fields'][0]['uuid'];
+    $factory = new PreparedJoomlaMailFactory();
+    $transport = new Nicode\EasyForms\Infrastructure\Joomla\MailTransport($factory,'sender@example.test','Forms');
+    $context = new Nicode\EasyForms\Actions\ActionContext(compiler()->compile($draft)->spec,[$field=>'visitor@example.test'],'reference','date');
+    foreach ([false,true] as $autoresponse) {
+        $action = new Nicode\EasyForms\Actions\EmailAction($transport,new Nicode\EasyForms\Actions\TokenTemplate(),$autoresponse);
+        $recipient = $autoresponse ? ['email_field'=>$field] : ['to'=>['team@example.test']];
+        $action->execute($recipient + ['subject'=>'Responses','email_format'=>'html','body_html'=>'<h2>Answers</h2><pre>{{field.'.$field.'.label}}: {{field.'.$field.'.option_label}}</pre><pre>{{response.summary}}</pre>'], $context);
+        $mail=$factory->messages[array_key_last($factory->messages)];
+        same(true,str_contains($mail->prepared,'multipart/alternative'));
+        same(true,str_contains($mail->Body,'visitor@example.test')); same(false,str_contains($mail->Body,'{{'));
+        same(true,str_contains($mail->AltBody,'visitor@example.test')); same(false,str_contains($mail->AltBody,'<h2>'));
+        $action->execute($recipient + ['subject'=>'Responses','email_format'=>'text','body_text'=>'{{response.summary}}','body_html'=>'<p>Stored but not sent</p>'], $context);
+        $mail=$factory->messages[array_key_last($factory->messages)];
+        same(false,str_contains($mail->prepared,'multipart/alternative')); same(false,str_contains($mail->prepared,'Stored but not sent'));
+        same(true,str_contains($mail->Body,'visitor@example.test'));
+    }
+});

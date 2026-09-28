@@ -112,7 +112,7 @@ export function mountEmailTemplatePicker(host, {root, draft, action, formId, isD
         if (!record || record.revision < 1) throw new Error(t('template_save_required'));
         const result = await api(root.dataset.csrf, 'bind', {id: record.id, revision: record.revision, form_id: formId, bindings: Object.fromEntries([...mapping].map(([key, input]) => [key, input.value]))});
         if (target.value === 'base') {
-          for (const key of ['subject', 'body_text', 'body_html', 'template']) delete action.config[key]; Object.assign(action.config, result.config);
+          for (const key of ['subject', 'body_text', 'body_html', 'template']) delete action.config[key]; Object.assign(action.config, result.config); action.config.email_format = result.config.body_html ? 'html' : 'text';
         } else {
           draft.translations = configurationObject(draft.translations); const locale = Object.keys(draft.translations).find(value => value.toLowerCase() === result.language.toLowerCase()) ?? result.language;
           const translation = draft.translations[locale] = configurationObject(draft.translations[locale]); translation.actions = configurationObject(translation.actions);

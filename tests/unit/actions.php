@@ -107,3 +107,26 @@ test('repeated mail recipients require explicit selection in declaration order b
     same(3,count($transport->messages));
     $config['email_field_selection']='implicit'; same('action.email_selection',$action->validateConfiguration($config,'/action')[0]->code);
 });
+
+
+test('email format choice preserves legacy HTML and produces safe multipart fallback', function (): void {
+    $transport = new class implements MailTransportInterface {
+        public array $messages = [];
+        public function send(MailMessage $message): void { $this->messages[] = $message; }
+    };
+    $draft = definition(); $uuid = $draft['fields'][0]['uuid'];
+    $context = new ActionContext(compiler()->compile($draft)->spec, [$uuid => '<img src=x> & answer'], 'reference', 'date');
+    $action = new EmailAction($transport, new TokenTemplate());
+    $config = ['to'=>['to@example.test'], 'subject'=>'Answers', 'body_text'=>'Plain answer', 'body_html'=>'<p>{{field.'.$uuid.'.value}}</p>'];
+    $action->execute($config, $context);
+    same('<p>&lt;img src=x&gt; &amp; answer</p>', $transport->messages[0]->html);
+    $action->execute($config + ['email_format'=>'text'], $context);
+    same(null, $transport->messages[1]->html); same('Plain answer', $transport->messages[1]->text);
+    unset($config['body_text']); $config['email_format']='html';
+    same([], $action->validateConfiguration($config, '/action'));
+    $action->execute($config, $context);
+    same('<img src=x> & answer', $transport->messages[2]->text);
+    same('<p>&lt;img src=x&gt; &amp; answer</p>', $transport->messages[2]->html);
+    same(true, count($action->validateConfiguration(array_replace($config,['email_format'=>'invalid']), '/action')) > 0);
+    same(true, count($action->validateConfiguration(array_replace($config,['body_html'=>'']), '/action')) > 0);
+});
