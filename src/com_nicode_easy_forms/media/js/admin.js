@@ -1,3 +1,4 @@
+import {actionControls} from './admin-toolbar.js';
 import {containers, decorations, descendants, moveElement, reparentElement, removeElement, addElement, configurationObject, supportsStepParent, insertionParent, revealAncestors} from './builder-model.js';
 import {mountAutomationEditor} from './automation-editor.js';
 import {mountBuilderDrag} from './builder-drag.js';
@@ -60,7 +61,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
     }
     busy = true;
     const previousFocus = document.activeElement;
-    const controls = [...root.querySelectorAll('button,input,select,textarea')].map(control => [control, control.disabled]);
+    const controls = actionControls(root, 'button,input,select,textarea').map(control => [control, control.disabled]);
     for (const [control] of controls) control.disabled = true;
     try { await operation(); }
     catch (error) { announce(error.message || t('unexpected_error'), true); if (error.diagnostics) diagnostics(error.diagnostics); }
@@ -317,7 +318,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
       announce(t('permissions_applied'));
     })));
   }
-  for (const trigger of root.querySelectorAll('[data-nef-command]')) trigger.addEventListener('click', () => run(async () => {
+  for (const trigger of actionControls(root, '[data-nef-command]')) trigger.addEventListener('click', () => run(async () => {
     const id = Number(data.form.id);
     if (trigger.dataset.nefCommand === 'duplicate') {
       if (settingsDirty || permissionsDirty) { announce(t('duplicate_settings'), true); return; }
@@ -347,7 +348,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
     if (['unpublish', 'archive', 'trash'].includes(trigger.dataset.nefCommand)) {
       const state = {unpublish:'unpublished', archive:'archived', trash:'trashed'}[trigger.dataset.nefCommand];
       if (state !== 'unpublished' && !await confirmAction(t(`${state}_form_help`))) return;
-      const result = await api('deactivate', {id, revision, state}); revision = result.revision; data.form.state = state; root.querySelector('[data-nef-form-state]').textContent = t(`state_${state}`); const deletion = root.querySelector('[data-nef-command="delete"]'); if (deletion) deletion.hidden = state !== 'trashed'; announce(t(`state_${state}`)); return;
+      const result = await api('deactivate', {id, revision, state}); revision = result.revision; data.form.state = state; root.querySelector('[data-nef-form-state]').textContent = t(`state_${state}`); const deletion = actionControls(root, '[data-nef-command="delete"]')[0]; if (deletion) deletion.hidden = state !== 'trashed'; announce(t(`state_${state}`)); return;
     }
     if (trigger.dataset.nefCommand === 'settings') {
       const settings = {name: draft.name};

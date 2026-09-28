@@ -15,12 +15,6 @@ $groups = [
 ?>
 <section class="nef-admin" data-nef-dashboard>
   <h1><?= $label('title') ?></h1>
-  <nav aria-label="<?= $escape($label('navigation')) ?>" class="nef-dashboard-nav">
-    <?php foreach (['forms' => 'FORMS', 'submissions' => 'SUBMISSIONS', 'jobs' => 'JOBS'] as $view => $key): ?><a class="btn btn-secondary" href="<?= $escape($url($view)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_' . $key) ?></a><?php endforeach ?>
-    <?php if ($data['canResources']): ?><a class="btn btn-secondary" href="<?= $escape($url('resources')) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_OPTION_SETS') ?></a><?php endif ?>
-    <?php if ($data['canDiagnose']): ?><a class="btn btn-secondary" href="<?= $escape($url('health')) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_HEALTH') ?></a><a class="btn btn-secondary" href="<?= $escape($url('logs')) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_TECHNICAL_LOG') ?></a><?php endif ?>
-    <?php if ($data['canConfigure']): ?><a class="btn btn-secondary" href="<?= $escape(Route::_('index.php?option=com_config&view=component&component=com_nicode_easy_forms', false)) ?>"><?= Text::_('JOPTIONS') ?></a><?php endif ?>
-  </nav>
   <p><?= $label('scope') ?></p>
   <p><?= $label('observed') ?>: <time><?= $escape($report['observed_at']) ?> UTC</time> · <a href="<?= $escape($url('dashboard')) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_REFRESH') ?></a></p>
   <?php foreach ($groups as $group => $keys): ?>

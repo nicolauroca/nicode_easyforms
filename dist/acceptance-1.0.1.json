@@ -1,0 +1,23 @@
+{
+  "version": "1.0.1",
+  "sha256": "7d13ad4b5e7305fa1973bfc4c2447fc155a39f25d2cdbd9b6449e161e5fb0622",
+  "requirements_complete": 133,
+  "requirements_remaining": 0,
+  "php_tests": 295,
+  "javascript_tests": 162,
+  "product_steps": 40,
+  "native_admin_sections": 11,
+  "native_admin_details": 5,
+  "native_web_update": true,
+  "browser_actions": [
+    "new",
+    "save",
+    "publish",
+    "preview",
+    "more-actions",
+    "unpublish",
+    "back"
+  ],
+  "accessibility": "Existing user acceptance of 1.0.0 retained; no new manual screen-reader certification claimed",
+  "evidence": "docs/REQUIREMENT_ACCEPTANCE.md"
+}

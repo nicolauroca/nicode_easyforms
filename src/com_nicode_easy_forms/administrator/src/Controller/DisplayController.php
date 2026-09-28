@@ -133,6 +133,8 @@ final class DisplayController extends BaseController
         }
         $assets->getRegistry()->addExtensionRegistryFile('com_nicode_easy_forms');
         $assets->useScript('com_nicode_easy_forms.admin')->useStyle('com_nicode_easy_forms.admin');
+        if ($name === 'submission') { $data['toolbarReturnParams'] = ['form_id' => $this->input->getInt('form_id')]; }
+        \Nicode\Component\EasyForms\Administrator\Service\AdminToolbar::build($name, $data, $this->input->getString('kind', 'email'));
         $view = $this->getView(ucfirst($name), 'html'); $view->data = $data; $view->document = $this->app->getDocument(); $view->display();
         return $this;
         } catch (\OutOfBoundsException $error) { throw new \RuntimeException('Requested EasyForms record is unavailable.', 404); }

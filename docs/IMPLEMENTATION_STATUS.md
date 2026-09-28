@@ -10,7 +10,7 @@ are working states, never completed requirement claims. Complete requirements: 1
 - PHP 8.5.8 and Node 24.15.0 available.
 - `php tools/lint.php`: passed at last recorded run.
 - `php tests/run.php --joomla`: 295 tests, 0 failures.
-- `node tools/test-js.mjs`: 161 tests, 0 failures.
+- `node tools/test-js.mjs`: 162 tests, 0 failures.
 - Official Joomla 6.0.0 archive SHA-256 verified; core installed in the isolated fixture database. Native package installation and preserve uninstall/reinstall are verified by tests/joomla-lifecycle.php; this is not full release acceptance.
 - Isolated MariaDB 11.4.5 on 127.0.0.1:13367; official archive SHA-256 verified.
 - `php tests/database.php`: persistence, publication, replay, search, leases, actions, privacy, export, ingress and administrative service scenarios passed.

@@ -8,16 +8,8 @@ $data = $this->data; $filters = $data['filters'];
 ?>
 <section class="nef-admin" data-nef-admin data-csrf="<?= $escape($data['csrf']) ?>">
   <h1><?= Text::_('COM_NICODE_EASY_FORMS_FORMS') ?></h1>
-  <p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=dashboard', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_DASH_TITLE') ?></a></p>
-  <?php if ($data['canPurge']): ?><p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=purge', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_PURGE_TITLE') ?></a></p><?php endif ?>
-  <?php if ($data['canConfigure']): ?><p><a href="<?= $escape(Route::_('index.php?option=com_config&view=component&component=com_nicode_easy_forms', false)) ?>"><?= Text::_('JOPTIONS') ?></a></p><?php endif ?>
-  <p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=submissions', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_SUBMISSIONS') ?></a></p>
-  <?php if ($data['canDiagnose']): ?><p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=health', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_HEALTH') ?></a></p><?php endif ?>
-  <?php if ($data['canDiagnose']): ?><p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=audit', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_AUDIT') ?></a></p><?php endif ?>
   <p role="status" data-nef-status aria-live="polite"></p>
-  <?php if ($data['canResources']): ?><p><a href="<?= $escape(Route::_('index.php?option=com_nicode_easy_forms&view=resources', false)) ?>"><?= Text::_('COM_NICODE_EASY_FORMS_OPTION_SETS') ?></a></p><?php endif ?>
   <?php if ($data['canCreate']): ?>
-  <button type="button" class="btn btn-secondary" data-nef-transfer="import"><?= Text::_('COM_NICODE_EASY_FORMS_DEFINITION_IMPORT') ?></button>
   <details><summary><?= Text::_('COM_NICODE_EASY_FORMS_NEW') ?></summary>
     <form data-nef-create class="nef-admin-create">
       <label><?= Text::_('COM_NICODE_EASY_FORMS_NAME') ?><input name="name" required maxlength="255"></label>

@@ -1,3 +1,4 @@
+import {actionControls} from './admin-toolbar.js';
 const t = key => Joomla.Text._(`COM_NICODE_EASY_FORMS_${key.toUpperCase()}`);
 const element = (tag, text) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; return node; };
 
@@ -12,7 +13,7 @@ export function mountDefinitionTransfer(root, context = () => null) {
     if (!response.ok || !result.ok) throw new Error(t(typeof result.error === 'string' ? result.error : 'session_error'));
     return result.data;
   }
-  for (const trigger of root.querySelectorAll('[data-nef-transfer]')) trigger.addEventListener('click', () => {
+  for (const trigger of actionControls(root, '[data-nef-transfer]')) trigger.addEventListener('click', () => {
     const current = context(); const exporting = trigger.dataset.nefTransfer === 'export';
     const template = trigger.dataset.nefTemplateId ? {id: Number(trigger.dataset.nefTemplateId), revision: Number(trigger.dataset.nefTemplateRevision)} : null;
     const outerStatus = root.querySelector('[data-nef-status]');

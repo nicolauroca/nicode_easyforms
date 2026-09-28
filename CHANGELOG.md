@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — 2026-09-28
+
+- Replace the development installation text with a translated completion panel: version, setup steps, package contents, system diagnostics, documentation, source repository and issue links.
+- Add Joomla administrator submenus and native toolbars across all sixteen component views, with permission-aware actions, contextual Back, section navigation, Options and Help.
+- Move builder actions into the native toolbar, retain JSON/CSRF/concurrency handling and unsaved-change protection, and connect resource saves and form creation to native buttons.
+- Correct stable extension descriptions and web asset version metadata. Preserve the published 1.0.0 archive.
+
 ## 1.0.0 — 2026-09-28
 
 - Initial stable package. Accessibility accepted explicitly by the user; the outstanding manual screen-reader check was waived without claiming it was executed.

@@ -2,11 +2,11 @@
 <extension type="package" method="upgrade">
   <name>pkg_nicode_easy_forms</name>
   <packagename>nicode_easy_forms</packagename>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <author>Nicode</author>
   <creationDate>2026-09</creationDate>
   <license>GPL-2.0-or-later</license>
-  <description>Development integration package. Not a product release.</description>
+  <description>Nicode EasyForms for Joomla — form builder, response management and automation.</description>
   <blockChildUninstall>true</blockChildUninstall>
   <scriptfile>script.php</scriptfile>
   <files folder="packages">

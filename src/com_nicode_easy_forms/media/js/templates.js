@@ -1,3 +1,4 @@
+import {actionControls} from './admin-toolbar.js';
 import {configurationObject} from './builder-model.js';
 import {mountDefinitionTransfer} from './definition-transfer.js';
 
@@ -54,7 +55,7 @@ for (const root of document.querySelectorAll('[data-nef-email-template]')) {
 }
 
 export function mountTemplateCapture(root, context) {
-  const trigger = root.querySelector('[data-nef-template-capture]'); if (!trigger) return;
+  const trigger = actionControls(root, '[data-nef-template-capture]')[0]; if (!trigger) return;
   trigger.addEventListener('click', () => {
     const current = context(); if (current.dirty) { root.querySelector('[data-nef-status]').textContent = t('transfer_save_first'); return; }
     const ui = dialog(trigger, t('template_capture')), name = labelled(ui.content, t('name'), node('input', undefined, {required: 'required', maxlength: '255'})); name.value = current.name;

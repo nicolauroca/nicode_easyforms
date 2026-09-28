@@ -11,22 +11,6 @@ $data = $this->data;
   <h1 data-nef-form-title><?= $escape($data['form']['name']) ?></h1>
   <p><strong data-nef-form-state><?= Text::_('COM_NICODE_EASY_FORMS_STATE_' . strtoupper($data['form']['state'])) ?></strong> · <?= Text::_('COM_NICODE_EASY_FORMS_ID') ?> <?= (int) $data['form']['id'] ?></p>
   <p role="status" data-nef-status aria-live="polite"></p>
-  <div class="nef-admin-toolbar">
-    <button type="button" class="btn btn-primary" data-nef-command="save"><?= Text::_('COM_NICODE_EASY_FORMS_SAVE') ?></button>
-    <?php if ($data['canPublish']): ?>
-    <button type="button" class="btn btn-success" data-nef-command="publish"><?= Text::_('COM_NICODE_EASY_FORMS_PUBLISH') ?></button>
-    <button type="button" class="btn btn-secondary" data-nef-command="unpublish"><?= Text::_('COM_NICODE_EASY_FORMS_UNPUBLISH') ?></button>
-    <button type="button" class="btn btn-secondary" data-nef-command="archive"><?= Text::_('COM_NICODE_EASY_FORMS_ARCHIVE_FORM') ?></button>
-    <?php if ($data['canTrash']): ?><button type="button" class="btn btn-danger" data-nef-command="trash"><?= Text::_('COM_NICODE_EASY_FORMS_TRASH_FORM') ?></button><?php endif ?>
-    <?php endif ?>
-    <?php if ($data['canDelete']): ?><button type="button" class="btn btn-danger" data-nef-command="delete" <?= in_array($data['form']['state'], ['trashed', 'deleting'], true) ? '' : 'hidden' ?>><?= Text::_('COM_NICODE_EASY_FORMS_DELETE_FORM') ?></button><?php endif ?>
-    <button type="button" class="btn btn-secondary" data-nef-command="preview"><?= Text::_('JGLOBAL_PREVIEW') ?></button>
-    <button type="button" class="btn btn-secondary" data-nef-command="history"><?= Text::_('COM_NICODE_EASY_FORMS_VERSIONS') ?></button>
-    <?php if ($data['canCreate']): ?><button type="button" class="btn btn-secondary" data-nef-command="duplicate"><?= Text::_('COM_NICODE_EASY_FORMS_DUPLICATE') ?></button><?php endif ?>
-    <button type="button" class="btn btn-secondary" data-nef-transfer="export"><?= Text::_('COM_NICODE_EASY_FORMS_DEFINITION_EXPORT') ?></button>
-    <button type="button" class="btn btn-secondary" data-nef-transfer="import"><?= Text::_('COM_NICODE_EASY_FORMS_DEFINITION_IMPORT') ?></button>
-    <?php if ($data['canResourceEdit']): ?><button type="button" class="btn btn-secondary" data-nef-template-capture><?= Text::_('COM_NICODE_EASY_FORMS_TEMPLATE_CAPTURE') ?></button><?php endif ?>
-  </div>
   <?php if ($data['canPublish']): ?><label><?= Text::_('COM_NICODE_EASY_FORMS_VERSION_COMMENT') ?><input data-nef-publish-comment maxlength="4000"></label><?php endif ?>
   <label><?= Text::_('COM_NICODE_EASY_FORMS_NAME') ?><input data-nef-name required maxlength="255" value="<?= $escape($data['draft']['name']) ?>"></label>
   <p><?= Text::_('COM_NICODE_EASY_FORMS_DRAFT_HELP') ?></p>
