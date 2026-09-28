@@ -3808,3 +3808,12 @@ OPS-008 is COMPLETE. Installation: use Joomla's extension installer with the ver
 Native Joomla web update renders the translated package completion panel and documentation links. `php tests/joomla-admin-navigation.php` verifies eleven section toolbars, five detail return paths, editor actions, installed administrator submenu entries and the web installer summary. Browser verification covers native New, Save draft, Compile and publish, Preview and More actions; existing controller ACL, CSRF, revision and unsaved-state handling remain in place. The 1.0.0 accessibility acceptance remains historical; this update makes no additional manual screen-reader certification claim.
 
 The final 1.0.1 ZIP SHA-256 is `7d13ad4b5e7305fa1973bfc4c2447fc155a39f25d2cdbd9b6449e161e5fb0622`. All 295 PHP/Joomla tests and 162 JavaScript tests pass. Reproducible nested-package builds and tamper rejection pass. All forty product acceptance steps pass against this exact ZIP, with locally captured mail and synthetic CAPTCHA. Native web update and browser verification succeed, including returning from the editor to Forms.
+
+
+## 1.0.2 — compact tabbed editor (2026-09-28)
+
+Native browser verification on Joomla 6 confirms that the Go to button is 152 px wide, only one of twelve authorized editor panels is visible at a time, unsaved draft values survive tab switches, and Preview and Versions load automatically and reveal their tabs. An invalid Name in the hidden Fields panel is revealed and focused before saving. All configuration panels mount without console errors. Preview controls use a compact row. The editor retains native toolbar actions, controller ACL/CSRF/revision checks and existing unsaved-navigation protection.
+
+`node tools/test-js.mjs`: 166 tests pass, including keyboard tab navigation, preservation of controls, non-recursive programmatic preview selection and diagnostic focus after tab rendering. `php tests/run.php --joomla`: 295 tests pass. Native HTTP installation/navigation verifies tab-to-panel ARIA relationships and initial panel visibility. Reproducible package and tamper checks pass.
+
+Final package SHA-256: `401358aa343cf4f8d4938c6d96ab91905e6202cca7ec101e251bfeb6dedf6e65`. The exact 1.0.2 ZIP passes all forty native product acceptance steps using captured local mail and synthetic CAPTCHA.

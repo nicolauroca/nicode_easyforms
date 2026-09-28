@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 — 2026-09-28
+
+- Widen the native Go to button and replace the form editor's stacked configuration disclosures with keyboard-accessible top tabs.
+- Automatically activate and reveal Preview and Versions when requested from the toolbar or tab strip, with compact preview controls.
+- Preserve draft controls across tab changes and reveal the correct tab before focusing invalid fields or compiler diagnostics.
+
 ## 1.0.1 — 2026-09-28
 
 - Replace the development installation text with a translated completion panel: version, setup steps, package contents, system diagnostics, documentation, source repository and issue links.

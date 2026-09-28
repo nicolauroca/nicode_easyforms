@@ -33,3 +33,14 @@ test('locating a closed card waits for editor toggle redraw and then focuses the
   revealDiagnosticPanel(root,{selector:'[data-nef-actions-panel]',path:'/actions/99'},callback=>frames.push(callback)); frames.shift()();
   assert.equal(focused.at(-1),'summary');
 });
+
+test('locating a diagnostic reveals its tab before focusing the freshly rendered control', () => {
+  const events=[], frames=[], focused=[]; let cards=[];
+  const panel={parentElement:null,closest:()=>panel,querySelectorAll:()=>cards,querySelector:()=>null,dispatchEvent:event=>{
+    events.push(event.type);
+    cards=[{dataset:{nefDiagnosticPath:'/actions/0'},querySelector:()=>({focus:()=>focused.push('action')})}];
+  }};
+  revealDiagnosticPanel({querySelector:()=>panel},{selector:'[data-nef-actions-panel]',path:'/actions/0'},callback=>frames.push(callback));
+  assert.deepEqual(events,['nef:reveal-panel']); assert.deepEqual(focused,[]);
+  frames.shift()(); assert.deepEqual(focused,['action']);
+});

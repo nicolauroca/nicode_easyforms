@@ -1,3 +1,4 @@
+import {mountEditorTabs, revealEditorTarget} from './editor-tabs.js';
 import {actionControls} from './admin-toolbar.js';
 import {containers, decorations, descendants, moveElement, reparentElement, removeElement, addElement, configurationObject, supportsStepParent, insertionParent, revealAncestors} from './builder-model.js';
 import {mountAutomationEditor} from './automation-editor.js';
@@ -41,6 +42,10 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
   const status = root.querySelector('[data-nef-status]');
   const announce = (message, error = false) => { status.textContent = message; status.dataset.error = String(error); };
   let busy = false;
+  const tabs = root.hasAttribute('data-nef-editor') ? mountEditorTabs(root, name => {
+    const command = {preview:'preview', versions:'history'}[name];
+    if (command) actionControls(root, '[data-nef-command]').find(control => control.dataset.nefCommand === command)?.click();
+  }) : null;
   async function api(operation, payload = null, query = {}, signal = undefined) {
     const url = new URL('index.php', location.href);
     url.search = new URLSearchParams({option: 'com_nicode_easy_forms', task: `form.${operation}`, format: 'json', ...query});
@@ -57,7 +62,9 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
   async function run(operation, validate = true) {
     if (busy) return;
     for (const control of root.querySelectorAll('input,select,textarea')) {
-      if (validate && !control.checkValidity()) { control.reportValidity(); announce(t('invalid_request'), true); return; }
+      if (validate && !control.checkValidity()) { revealEditorTarget(control);
+        const invalid = [...root.querySelectorAll('input,select,textarea')].find(input => !input.checkValidity());
+        invalid?.reportValidity(); announce(t('invalid_request'), true); return; }
     }
     busy = true;
     const previousFocus = document.activeElement;
@@ -65,7 +72,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
     for (const [control] of controls) control.disabled = true;
     try { await operation(); }
     catch (error) { announce(error.message || t('unexpected_error'), true); if (error.diagnostics) diagnostics(error.diagnostics); }
-    finally { for (const [control, disabled] of controls) control.disabled = disabled; busy = false; if (previousFocus?.isConnected && !previousFocus.disabled) previousFocus.focus(); }
+    finally { for (const [control, disabled] of controls) control.disabled = disabled; busy = false; if (previousFocus?.isConnected && !previousFocus.disabled) previousFocus.focus({preventScroll:true}); }
   }
   root.querySelector('[data-nef-create]')?.addEventListener('submit', event => {
     event.preventDefault(); const data = new FormData(event.target);
@@ -110,7 +117,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
       if (target) li.append(button(t('locate'), () => {
         if (target.kind === 'translation') translationEditor.reveal(target.locale, target.path);
         else if (target.kind === 'panel') revealDiagnosticPanel(root, target);
-        else { choose(target.uuid); root.querySelector('[data-nef-inspector] input, [data-nef-inspector] select, [data-nef-inspector] textarea')?.focus(); }
+        else { tabs.select('fields', {scroll:true}); choose(target.uuid); root.querySelector('[data-nef-inspector] input, [data-nef-inspector] select, [data-nef-inspector] textarea')?.focus(); }
       }));
       list.append(li);
     }
@@ -178,8 +185,8 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
         if (Object.hasOwn(result.draft, key)) draft[key] = result.draft[key];
       }
       revision = result.revision; dirty = false;
-      for (const panel of root.querySelectorAll('[data-nef-logic-panel], [data-nef-validator-panel]')) panel.dispatchEvent(new Event('toggle'));
-      root.querySelector('[data-nef-translations]')?.closest('details')?.dispatchEvent(new Event('toggle'));
+      for (const panel of root.querySelectorAll('[data-nef-logic-panel], [data-nef-validator-panel]')) panel.dispatchEvent(new Event('nef:panelshown'));
+      root.querySelector('[data-nef-translations]')?.closest('[data-nef-tab-panel]')?.dispatchEvent(new Event('nef:panelshown'));
       choose(result.selected); announce(t('saved'));
     })));
     for (const [key, direction] of [['move_up', -1], ['move_down', 1]]) actions.append(button(t(key), () => { if (moveElement(draft, selected, direction)) { changed(); renderTree(); } }));
@@ -274,7 +281,10 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
   }
   function showPreview(result) {
     diagnostics(result.diagnostics);
-    const section = root.querySelector('[data-nef-preview]'); section.hidden = result.html === null;
+    const section = root.querySelector('[data-nef-preview]');
+    tabs.select('preview', {focus:true, scroll:true});
+    section.querySelector('.nef-preview-viewport').hidden = result.html === null;
+    section.querySelector('[data-nef-preview-empty]').hidden = result.html !== null;
     if (result.html === null) return;
     const iframe = section.querySelector('iframe');
     iframe.onload = () => {
@@ -365,7 +375,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
       return;
     }
     if (trigger.dataset.nefCommand === 'history') {
-      const result = await api('history', null, {id}); const section = root.querySelector('[data-nef-versions]'); section.hidden = false;
+      const result = await api('history', null, {id}); const section = root.querySelector('[data-nef-versions]'); tabs.select('versions', {focus:true, scroll:true});
       const list = section.querySelector('div'); list.replaceChildren();
       const comparison = node('div', undefined, {class: 'nef-admin-toolbar'}); const selections = [];
       for (const key of ['compare_from', 'compare_to']) {
@@ -464,7 +474,7 @@ for (const root of document.querySelectorAll('[data-nef-admin]')) {
     }
     if (!eligible.length && !selected.length) preservedFields.append(node('p', t(labelKey + '_empty')));
   };
-  postPanel.closest('details').addEventListener('toggle', renderPreservedFields);
+  postPanel.closest('[data-nef-tab-panel]').addEventListener('nef:panelshown', renderPreservedFields);
   renderPreservedFields();
   }
   renderTree(); renderInspector();

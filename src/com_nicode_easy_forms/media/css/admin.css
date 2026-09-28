@@ -63,3 +63,17 @@ body.com_nicode_easy_forms .container-main { min-width: 0; }
 .nef-dashboard-metrics > div { border: 1px solid #8b9299; border-radius: .4rem; padding: 1rem; }
 .nef-dashboard-metrics dt { font-size: 1rem; font-weight: 500; }
 .nef-dashboard-metrics dd { margin: .4rem 0 0; font-size: 1.7rem; font-variant-numeric: tabular-nums; font-weight: 700; }
+/* Native navigation needs room for both its label and dropdown indicator. */
+#toolbar-nef-navigation > button { min-inline-size: 9.5rem; padding-inline: 1.25rem; white-space: nowrap; }
+.nef-editor-tabs { display: flex; flex-wrap: wrap; gap: .25rem; margin-block: 1rem; padding: .35rem; border: 1px solid var(--nef-border); border-radius: .4rem; scroll-margin-block-start: 10rem; }
+.nef-editor-tabs [role=tab] { border: 0; border-radius: .25rem; padding: .65rem .9rem; background: transparent; color: inherit; font: inherit; font-weight: 600; }
+.nef-editor-tabs [role=tab]:hover { background: var(--template-bg-light, #e9ecef); color: var(--template-text-dark, #212529); }
+.nef-editor-tabs [role=tab][aria-selected=true] { background: var(--btn-primary-bg, #175ca4); color: #fff; }
+.nef-admin [data-nef-tab-panel][hidden] { display: none !important; }
+.nef-admin [data-nef-tab-panel] { min-width: 0; max-width: 100%; padding-block: .5rem; }
+.nef-admin [data-nef-tab-panel] > h2 { font-size: 1.25rem; margin-block: .5rem 1rem; }
+.nef-admin [data-nef-diagnostics] { max-height: 16rem; overflow: auto; }
+.nef-admin [data-nef-tab-panel=fields] > label { max-width: 45rem; }
+.nef-admin .nef-preview-tools { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+.nef-admin .nef-preview-tools > label { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0; }
+.nef-admin [data-nef-status]:empty { display: none; }

@@ -172,6 +172,6 @@ export function mountAutomationEditor(root, {draft, providers, changed, node, bu
     }));
   }
   function redraw() { renderLogic(); renderActions(); renderConditionalMessages(); }
-  for (const selector of ['[data-nef-logic-panel]', '[data-nef-actions-panel]', '[data-nef-conditional-panel]']) root.querySelector(selector).addEventListener('toggle', redraw);
+  for (const selector of ['[data-nef-logic-panel]', '[data-nef-actions-panel]', '[data-nef-conditional-panel]']) root.querySelector(selector).addEventListener('nef:panelshown', redraw);
   redraw();
 }

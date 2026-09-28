@@ -1,3 +1,4 @@
+import {revealEditorTarget} from './editor-tabs.js';
 import {configurationObject} from './builder-model.js';
 import {confirmAction} from './confirm-action.js';
 
@@ -73,13 +74,13 @@ export function mountTranslationEditor(root, {draft, changed, node, button, t}) 
     content.append(messages); panel.append(content);
     language.addEventListener('input', () => { for (const input of content.querySelectorAll('input,textarea')) input.disabled = language.value !== locale; });
   }
-  panel.closest('details').addEventListener('toggle', event => { if (event.target.open) render(); });
+  panel.closest('[data-nef-tab-panel]').addEventListener('nef:panelshown', render);
   return {
     locale: () => locale,
     reveal: (requestedLocale, path) => {
       if (!Object.hasOwn(draft.translations ?? {}, requestedLocale)) return;
       locale = requestedLocale;
-      const container = panel.closest('details');
+      revealEditorTarget(panel);
       const reveal = () => {
         render();
         const input = [...panel.querySelectorAll('[data-nef-translation-path]')].find(control => control.dataset.nefTranslationPath === JSON.stringify(path)) || panel.querySelector('[data-nef-translation-locale]');
@@ -88,8 +89,7 @@ export function mountTranslationEditor(root, {draft, changed, node, button, t}) 
         }
         requestAnimationFrame(() => { if (input?.isConnected) input.focus(); });
       };
-      if (container.open) reveal();
-      else { container.addEventListener('toggle', reveal, {once:true}); container.open = true; }
+      reveal();
     },
   };
 }

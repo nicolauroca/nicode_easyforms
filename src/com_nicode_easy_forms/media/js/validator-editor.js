@@ -57,5 +57,5 @@ export function mountValidatorEditor(root, {draft, providers, changed, node, but
     }
   }
   // Reopening reflects field additions, renames and deletions from the canvas.
-  panel?.addEventListener('toggle', () => { if (panel.open) redraw(); }); redraw();
+  panel?.addEventListener('nef:panelshown', () => { if (!panel.hidden) redraw(); }); redraw();
 }

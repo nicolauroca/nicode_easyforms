@@ -36,6 +36,15 @@ foreach (['forms' => 'editor', 'resources' => 'optionset', 'templates' => 'email
     $page = $request('?' . $query); $dom = $xpath($page['body']);
     if ($page['status'] !== 200 || $dom->query('//*[@id="toolbar-nef-back"]')->length !== 1) { throw new RuntimeException('Detail Back unavailable: ' . $detail); }
     if ($detail === 'editor' && $dom->query('//*[@id="toolbar"]//button[@data-nef-command="save"]')->length !== 1) { throw new RuntimeException('Native editor save missing.'); }
+    if ($detail === 'editor') {
+        $tabs = $dom->query('//button[@role="tab" and @data-nef-tab]');
+        if ($tabs->length < 10 || $dom->query('//*[@data-nef-tab-panel and not(@hidden)]')->length !== 1 || $dom->query('//*[@data-nef-tab-panel="fields" and not(@hidden)]')->length !== 1) { throw new RuntimeException('Editor must initially expose only its Fields panel.'); }
+        foreach ($tabs as $tab) {
+            $id = $tab->getAttribute('aria-controls');
+            $target = $dom->query('//*[@id="' . $id . '" and @role="tabpanel"]')->item(0);
+            if (!$target instanceof DOMElement || $target->getAttribute('aria-labelledby') !== $tab->getAttribute('id')) { throw new RuntimeException('Editor tab/panel relationship missing.'); }
+        }
+    }
 }
 // Exercise the real web installer and its postflight presentation.
 $install = $request('?option=com_installer&view=install'); $post = [];

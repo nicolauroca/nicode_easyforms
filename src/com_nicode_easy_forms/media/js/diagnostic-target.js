@@ -1,3 +1,4 @@
+import {revealEditorTarget} from './editor-tabs.js';
 /** Resolve only known draft paths; diagnostic text never becomes a CSS selector. */
 export function diagnosticTarget(path, draft) {
   if (typeof path !== 'string') return null;
@@ -29,11 +30,12 @@ export function revealDiagnosticPanel(root, target, schedule = callback => reque
   if (!panel) return;
   const focus = () => {
     const card = [...panel.querySelectorAll('[data-nef-diagnostic-path]')].find(node => node.dataset.nefDiagnosticPath === target.path);
-    const control = card?.querySelector('input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])') || panel.querySelector('summary');
+    const control = card?.querySelector('input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])') || panel.querySelector('summary') || panel;
     control?.focus();
   };
   // Editors rebuild their cards on toggle. Run after their registered listeners.
   const afterRender = () => schedule(focus);
+  if (revealEditorTarget(panel)) { afterRender(); return; }
   if (!panel.open) { panel.addEventListener('toggle', afterRender, {once:true}); panel.open = true; }
   else afterRender();
 }

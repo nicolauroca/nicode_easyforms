@@ -1,10 +1,23 @@
 # Guía de administración
 
+## Organización del editor
+
+Las pestañas superiores separan Campos, Lógica, Validación, Acciones, Privacidad,
+Seguridad, Después del envío, Traducciones, Publicación, Permisos, Vista previa y
+Versiones. Las secciones de Publicación y Permisos dependen de los permisos del
+administrador. Solo se muestra una sección cada vez y los cambios del borrador
+se conservan al pasar de una a otra.
+
+**Vista previa** y **Versiones** abren su pestaña y cargan el resultado automáticamente.
+Los errores de validación y los enlaces para localizar diagnósticos revelan la
+pestaña del control afectado. Las flechas, Inicio y Fin permiten recorrer las
+pestañas con el teclado; Intro o Espacio activa la seleccionada.
+
 ## Instalación y primera configuración
 
 Instale el ZIP del paquete desde el instalador de extensiones de Joomla 6. El
 paquete contiene componente, biblioteca, módulo y plugins de tareas y extensiones.
-La entrega 1.0.1 está en `dist/pkg_nicode_easy_forms-1.0.1.zip`; consulte
+La entrega 1.0.2 está en `dist/pkg_nicode_easy_forms-1.0.2.zip`; consulte
 [el estado y la aceptación](IMPLEMENTATION_STATUS.md).
 
 El resumen del instalador muestra la versión, el contenido del paquete, los próximos pasos y enlaces a documentación y soporte.

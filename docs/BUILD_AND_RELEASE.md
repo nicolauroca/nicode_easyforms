@@ -1,7 +1,7 @@
 # Build and release
 
-The current software version is `1.0.1`. The stable package is
-`dist/pkg_nicode_easy_forms-1.0.1.zip`. Database acceptance covers MariaDB 11.4.5,
+The current software version is `1.0.2`. The stable package is
+`dist/pkg_nicode_easy_forms-1.0.2.zip`. Database acceptance covers MariaDB 11.4.5,
 MySQL 8.4.8 and PostgreSQL 14.24 with Joomla 6.0.0. The user explicitly accepted
 accessibility and waived the outstanding manual screen-reader check; no executed
 screen-reader test or WCAG certification is claimed.
