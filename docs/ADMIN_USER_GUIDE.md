@@ -17,7 +17,7 @@ pestañas con el teclado; Intro o Espacio activa la seleccionada.
 
 Instale el ZIP del paquete desde el instalador de extensiones de Joomla 6. El
 paquete contiene componente, biblioteca, módulo y plugins de tareas y extensiones.
-La entrega 1.0.2 está en `dist/pkg_nicode_easy_forms-1.0.2.zip`; consulte
+La entrega 1.0.3 está en `dist/pkg_nicode_easy_forms-1.0.3.zip`; consulte
 [el estado y la aceptación](IMPLEMENTATION_STATUS.md).
 
 El resumen del instalador muestra la versión, el contenido del paquete, los próximos pasos y enlaces a documentación y soporte.

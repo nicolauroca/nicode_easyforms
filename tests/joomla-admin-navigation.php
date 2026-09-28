@@ -37,6 +37,13 @@ foreach (['forms' => 'editor', 'resources' => 'optionset', 'templates' => 'email
     if ($page['status'] !== 200 || $dom->query('//*[@id="toolbar-nef-back"]')->length !== 1) { throw new RuntimeException('Detail Back unavailable: ' . $detail); }
     if ($detail === 'editor' && $dom->query('//*[@id="toolbar"]//button[@data-nef-command="save"]')->length !== 1) { throw new RuntimeException('Native editor save missing.'); }
     if ($detail === 'editor') {
+        $imports = [];
+        foreach ($dom->query('//script[@type="importmap"]') as $map) { $imports += json_decode($map->textContent, true, flags: JSON_THROW_ON_ERROR)['imports'] ?? []; }
+        foreach (glob($root . '/src/com_nicode_easy_forms/media/js/*.js') as $module) {
+            $uri = 'http://127.0.0.1:13371/media/com_nicode_easy_forms/js/' . basename($module);
+            if (($imports[$uri] ?? null) !== $uri . '?' . hash_file('sha256', $module)) { throw new RuntimeException('Missing or stale module import map: ' . basename($module)); }
+        }
+
         $tabs = $dom->query('//button[@role="tab" and @data-nef-tab]');
         if ($tabs->length < 10 || $dom->query('//*[@data-nef-tab-panel and not(@hidden)]')->length !== 1 || $dom->query('//*[@data-nef-tab-panel="fields" and not(@hidden)]')->length !== 1) { throw new RuntimeException('Editor must initially expose only its Fields panel.'); }
         foreach ($tabs as $tab) {

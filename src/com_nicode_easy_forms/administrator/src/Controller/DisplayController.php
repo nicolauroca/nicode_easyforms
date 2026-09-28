@@ -132,6 +132,7 @@ final class DisplayController extends BaseController
             if (is_string($metadata['label_key'] ?? null) && $metadata['label_key'] !== '') { \Joomla\CMS\Language\Text::script($metadata['label_key']); }
         }
         $assets->getRegistry()->addExtensionRegistryFile('com_nicode_easy_forms');
+        \Nicode\EasyForms\Infrastructure\Joomla\ModuleAssets::register($assets, JPATH_ROOT . '/media/com_nicode_easy_forms/js', \Joomla\CMS\Uri\Uri::root() . 'media/com_nicode_easy_forms/js');
         $assets->useScript('com_nicode_easy_forms.admin')->useStyle('com_nicode_easy_forms.admin');
         if ($name === 'submission') { $data['toolbarReturnParams'] = ['form_id' => $this->input->getInt('form_id')]; }
         \Nicode\Component\EasyForms\Administrator\Service\AdminToolbar::build($name, $data, $this->input->getString('kind', 'email'));

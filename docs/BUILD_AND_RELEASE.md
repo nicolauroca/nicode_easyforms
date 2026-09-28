@@ -1,7 +1,7 @@
 # Build and release
 
-The current software version is `1.0.2`. The stable package is
-`dist/pkg_nicode_easy_forms-1.0.2.zip`. Database acceptance covers MariaDB 11.4.5,
+The current software version is `1.0.3`. The stable package is
+`dist/pkg_nicode_easy_forms-1.0.3.zip`. Database acceptance covers MariaDB 11.4.5,
 MySQL 8.4.8 and PostgreSQL 14.24 with Joomla 6.0.0. The user explicitly accepted
 accessibility and waived the outstanding manual screen-reader check; no executed
 screen-reader test or WCAG certification is claimed.
@@ -96,3 +96,5 @@ Its report records the package hash and each step in
 `build/product-acceptance-results.json`. It unpublishes its form/menu/modules
 afterward; unrelated native jobs are left untouched. Stop the test router when
 finished. These fixture commands must not target a production installation.
+
+ES module dependencies are registered through Joomla import maps with a SHA-256 content version. This also versions relative transitive imports, which do not inherit the entry script query. Keep ModuleAssets registration in both Administrator and public runtime asset loading; the native navigation test verifies the emitted map.

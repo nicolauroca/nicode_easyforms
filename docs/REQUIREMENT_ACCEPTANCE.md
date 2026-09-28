@@ -3817,3 +3817,12 @@ Native browser verification on Joomla 6 confirms that the Go to button is 152 px
 `node tools/test-js.mjs`: 166 tests pass, including keyboard tab navigation, preservation of controls, non-recursive programmatic preview selection and diagnostic focus after tab rendering. `php tests/run.php --joomla`: 295 tests pass. Native HTTP installation/navigation verifies tab-to-panel ARIA relationships and initial panel visibility. Reproducible package and tamper checks pass.
 
 Final package SHA-256: `401358aa343cf4f8d4938c6d96ab91905e6202cca7ec101e251bfeb6dedf6e65`. The exact 1.0.2 ZIP passes all forty native product acceptance steps using captured local mail and synthetic CAPTCHA.
+
+
+## 1.0.3 - existing editor initialization after upgrade (2026-09-28)
+
+Reproduced the reported blank Structure and Properties by serving the 1.0.1 translation module with the 1.0.2 tab markup in the isolated Joomla installation. Its obsolete details listener aborts initialization before privacy, security, confirmation and the initial tree/inspector render. The existing palette listener remains active, explaining why adding a field makes the tree appear. The previous 1.0.2 checks did not cover mixed cached module versions.
+
+Joomla now emits content-hashed import maps for every EasyForms module in administration and public runtime pages, including transitive imports. Translation controls render immediately as well as when reopening the tab. Browser verification on saved complex form 4676 covers all twelve panels, existing field properties without adding fields, saved rules/actions, privacy/security/confirmation, translations, publication/permissions, three historical versions and the saved preview. Returning to Fields retains the selected Email properties. Screenshot: ignored local tests/artifacts/editor-initialization-1.0.3.png. The cache failure was simulated locally; no access to the reporting production browser is claimed.
+
+PHP/Joomla: 297 tests pass; JavaScript: 167 tests pass. Added regression coverage for content identity changes, subdirectory import URLs and initial saved translations without draft mutation. Native web installation/navigation verifies emitted import maps against source hashes. Reproducibility and nested archive tamper rejection pass. All forty product acceptance steps pass on the exact 1.0.3 ZIP, SHA-256 `d0e3dad345f1b0d003d399f920f529fd15044bef1ed9cc5df25328685a97812e`, with captured local mail and synthetic CAPTCHA.

@@ -75,6 +75,7 @@ export function mountTranslationEditor(root, {draft, changed, node, button, t}) 
     language.addEventListener('input', () => { for (const input of content.querySelectorAll('input,textarea')) input.disabled = language.value !== locale; });
   }
   panel.closest('[data-nef-tab-panel]').addEventListener('nef:panelshown', render);
+  render();
   return {
     locale: () => locale,
     reveal: (requestedLocale, path) => {

@@ -1,0 +1,21 @@
+{
+  "version": "1.0.3",
+  "sha256": "d0e3dad345f1b0d003d399f920f529fd15044bef1ed9cc5df25328685a97812e",
+  "requirements_complete": 133,
+  "requirements_remaining": 0,
+  "php_tests": 297,
+  "javascript_tests": 167,
+  "product_steps": 40,
+  "native_web_update": true,
+  "native_admin_sections": 11,
+  "native_admin_details": 5,
+  "browser_checks": [
+    "reproduced blank structure and properties with 1.0.1 translation module and 1.0.2 tabs",
+    "saved complex form structure on initial load",
+    "existing field properties without adding fields",
+    "all twelve tabs including saved rules, actions, privacy, security, confirmation, translations, publication, permissions, preview and versions",
+    "selected field retained when returning to Fields",
+    "content-versioned import map emitted by Joomla"
+  ],
+  "evidence": "docs/REQUIREMENT_ACCEPTANCE.md"
+}

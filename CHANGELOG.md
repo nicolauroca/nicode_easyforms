@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 - 2026-09-28
+
+- Fix incomplete editor initialization after upgrading: Joomla import maps version every JavaScript module by content, including transitive imports.
+- Initialize saved translations on page load and retain refreshes when reopening tabs. Verify saved fields, properties and all editor panels.
+
 ## 1.0.2 — 2026-09-28
 
 - Widen the native Go to button and replace the form editor's stacked configuration disclosures with keyboard-accessible top tabs.
