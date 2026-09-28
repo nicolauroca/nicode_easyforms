@@ -1,5 +1,20 @@
 # 16 — Database Spec
 
+ADR 0018 define identidad literal de opciones e índices keyword: MySQL/MariaDB
+usan VARBINARY(1020) en option_value y value_keyword, preservando hasta 255 puntos
+de código UTF-8 y distinguiendo espacios finales. La actualización inspecciona
+y convierte las columnas anteriores; PostgreSQL conserva VARCHAR. La igualdad
+de texto largo también distingue espacios finales mediante comparación binaria.
+
+`installation_state` conserva checkpoints del instalador, configuración y
+snapshots ACL para reinstalación. No es una tabla de respuestas ni un almacén de
+secretos de proveedores. Sus claves únicas permiten restauraciones idempotentes.
+
+`technical_log` almacena nivel, evento de vocabulario cerrado, fecha UTC, UUID
+de correlación y referencias opcionales tipadas a formulario, versión, respuesta,
+acción y job. Es independiente de `audit_log` y no contiene texto libre ni PII.
+Sus índices cubren fecha, correlación y nivel; el visor usa paginación por ID.
+
 
 > Proyecto: **Nicode EasyForms**  
 > Estado del documento: **Especificación inicial normativa**  
@@ -288,6 +303,10 @@ Guardar timestamps en representación consistente definida por la arquitectura J
 
 ## 9. Migraciones
 
+La auditoría consultada desde una respuesta utiliza el índice compuesto
+`(form_id, submission_uuid, id)`, con lectura descendente y límite por página.
+No debe recorrer el historial de todo un formulario para abrir una respuesta.
+
 Cada cambio de schema:
 
 - script versionado;
@@ -296,3 +315,39 @@ Cada cambio de schema:
 - estrategia de datos;
 - índice creado de forma segura;
 - pruebas sobre datasets representativos.
+
+El historial de acciones de una respuesta usa `(submission_id, id)`;
+notas y auditoría mantienen sus índices por respuesta y cursor. Las tres lecturas
+usan límite de página más una fila y nunca OFFSET ni payloads de entregas.
+
+El provider SQL usa `(form_id, id)` para la ordenación por ID dentro de un formulario;
+la recepción usa los índices existentes con desempate por ID en ambas direcciones.
+
+## Registro previo de archivos
+
+`upload_staging` conserva propiedad antes de escribir bytes (ADR 0013): formulario,
+proveedor/clave únicos, token privado, estado reservado/listo, fechas, tamaño y
+checksum. Índices por caducidad/ID y formulario/ID permiten recuperación acotada.
+No tiene FK al formulario: la obligación de limpieza sobrevive a su eliminación.
+El esquema inicial de desarrollo contiene 30 tablas. Este cambio anterior a la
+primera publicación no representa una migración desde una versión distribuida.
+
+Las consultas propias siguen DatabaseInterface y parámetros enlazados. Para PDO,
+el adaptador traduce errores de ejecución antes de la recuperación implícita del
+driver, conserva rollback/savepoints y restaura inmediatamente la configuración
+de statements de la conexión. Si rollback falla, esa instancia queda cerrada a
+consultas/reintentos. Véase ADR 0014 y la prueba de integridad en tres motores.
+
+Auditoría e intentos de Actions tienen índice `(created_at,id)` para los jobs de
+retención de ADR 0016. La búsqueda del último intento usa la clave única existente
+`(submission_id,action_uuid,attempt)`. El instalador completa los índices ausentes
+en instalaciones de desarrollo de la misma versión; no reescribe datos ni cambia
+el número de tablas. Los lotes de historial cuentan candidatos examinados y
+conservan por separado el número eliminado.
+
+Los nombres de objetos con alcance de esquema incluyen el prefijo Joomla:
+constraints de FK en ambos dialectos e índices/constraints únicos en PostgreSQL.
+Los índices y claves únicas de MySQL tienen alcance de tabla. Dos instalaciones
+con prefijos distintos pueden compartir una base sin colisiones ni índices
+omitidos por `IF NOT EXISTS`. La aceptación instala dos juegos completos y
+comprueba sus claves únicas e índices antes de retirar solo esos juegos de prueba.

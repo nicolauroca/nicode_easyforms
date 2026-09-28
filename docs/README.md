@@ -25,6 +25,9 @@ Ambos canales deben utilizar el mismo motor de renderizado, reglas, validación,
 
 ## Índice documental
 
+La [guía de administración](ADMIN_USER_GUIDE.md) describe instalación,
+publicación, respuestas, trabajos y mantenimiento para usuarios de Joomla.
+
 | Archivo | Propósito |
 |---|---|
 | `00_PRODUCT_VISION.md` | Visión, alcance, principios, objetivos y no-objetivos |

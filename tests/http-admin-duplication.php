@@ -1,0 +1,34 @@
+<?php
+declare(strict_types=1);
+$duplicateSource = $api('record', query: ['id' => $id]);
+$duplicatePayload = ['id' => $id, 'revision' => (int) $duplicateSource['form']['draft_revision'], 'name' => 'HTTP duplicated draft', 'alias' => 'http-copy-' . bin2hex(random_bytes(6))];
+$api('duplicate', expected: 405);
+$api('duplicate', $duplicatePayload, expected: 403, csrf: false);
+$staleDuplicate = $duplicatePayload; $staleDuplicate['revision']--; $api('duplicate', $staleDuplicate, expected: 409);
+$duplicate = $api('duplicate', $duplicatePayload);
+$duplicateRecord = $api('record', query: ['id' => $duplicate['id']]);
+$assert($duplicateRecord['form']['state'] === 'draft' && $duplicateRecord['form']['published_version_id'] === null && $duplicateRecord['draft']['uuid'] !== $duplicateSource['draft']['uuid'] && $duplicateRecord['draft']['fields'][0]['uuid'] !== $duplicateSource['draft']['fields'][0]['uuid'], 'Native duplicate reused identity or published automatically.');
+$assert($duplicateRecord['form']['access'] === $duplicateSource['form']['access'] && $duplicateRecord['form']['language'] === $duplicateSource['form']['language'], 'Native duplicate widened public visibility.');
+$copyPermissions = $api('permissions', query: ['id' => $duplicate['id'], 'group' => 2]);
+$assert($copyPermissions['permissions']['easyforms.submissions.export']['direct'] === false, 'Native duplicate lost explicit source ACL denial.');
+$assert($api('history', query: ['id' => $duplicate['id']])['versions'] === [], 'Duplicate copied publication history.');
+$assert($api('record', query: ['id' => $id]) === $duplicateSource, 'Native duplication mutated the source.');
+$editorCopy = $request($base . '?option=com_nicode_easy_forms&view=editor&id=' . $duplicate['id']);
+$assert($editorCopy['status'] === 200 && str_contains($editorCopy['body'], 'data-nef-command="duplicate"'), 'Native copy editor or duplicate command missing.');
+file_put_contents($root . '/build/admin-duplication-results.json', json_encode(['passed' => true, 'timestamp' => gmdate(DATE_ATOM), 'source_id' => $id, 'copy_id' => $duplicate['id'], 'checks' => ['POST and CSRF', 'expected revision', 'distinct form and field UUID', 'draft-only copy', 'source unchanged', 'visibility preserved', 'explicit native ACL denial preserved']], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+echo "Native duplication HTTP: method/CSRF, conflict, new graph identity, draft state, source isolation and copied Joomla ACL denial passed.\n";
+
+$branchBefore = $api('record', query: ['id' => $duplicate['id']]);
+$branchPayload = ['id'=>$duplicate['id'], 'revision'=>(int)$branchBefore['form']['draft_revision'], 'element'=>$branchBefore['draft']['elements'][0]['uuid']];
+$api('duplicateElement', expected:405);
+$api('duplicateElement', $branchPayload, expected:403, csrf:false);
+$branchBad = $branchPayload; $branchBad['revision']--; $api('duplicateElement',$branchBad,expected:409);
+$branchBad = $branchPayload; $branchBad['element']='missing'; $api('duplicateElement',$branchBad,expected:422);
+$assert($api('record',query:['id'=>$duplicate['id']]) === $branchBefore, 'Failed branch duplication mutated the draft.');
+$branchCopy = $api('duplicateElement',$branchPayload);
+$assert($branchCopy['selected'] !== $branchPayload['element'] && count($branchCopy['draft']['fields']) === count($branchBefore['draft']['fields']) + 1, 'Branch duplicate identity or field count incorrect.');
+$assert(count(array_unique(array_column($branchCopy['draft']['fields'],'name'))) === count($branchCopy['draft']['fields']), 'Branch duplicate reused machine names.');
+$api('duplicateElement',$branchPayload,expected:409);
+$branchAfter = $api('record',query:['id'=>$duplicate['id']]);
+$assert($branchAfter['draft'] === $branchCopy['draft'] && $branchAfter['form']['published_version_id'] === null, 'Branch copy was not saved as a draft.');
+echo "Native branch duplication: method/CSRF, stale revision, invalid source rollback, new identity/name and saved draft isolation passed.\n";

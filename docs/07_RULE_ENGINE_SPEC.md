@@ -134,6 +134,11 @@ Manipular JavaScript no permitirá eludir reglas.
 
 Las Rules que cambian valores/opciones pueden provocar nuevas Rules.
 
+Las opciones de `change_options` conservan el contrato de identidad literal:
+no se permiten valores duplicados dentro de la lista y los flags `enabled` y
+`default`, si aparecen, deben ser booleanos. El compilador rechaza los valores
+mal formados con una ruta hasta la opción o flag afectado, antes de publicar.
+
 El Engine deberá evaluar hasta estado estable con:
 
 - orden determinista;
@@ -141,3 +146,29 @@ El Engine deberá evaluar hasta estado estable con:
 - detección de ciclo/no convergencia.
 
 Una no convergencia será error de configuración.
+
+## 11. Semántica de evaluación 1.0
+
+Se evalúan las Rules por prioridad ascendente y UUID lexicográfico como desempate.
+Cada iteración lee los valores activos de la iteración anterior y reconstruye
+efectos sobre el estado inicial; una condición que deja de cumplirse retrae sus
+efectos. Mayor prioridad se aplica después. Los ancestros ocultos/inactivos hacen
+inactivos a sus descendientes. Valores inactivos se leen como null y no salen en
+el resultado aceptado. Los cambios de valor/opciones requieren estabilización;
+un estado repetido o el límite de 64 iteraciones generan error de configuración.
+Los operadores numéricos usan decimales exactos; igualdad de texto no convierte
+`01` en `1`. Los fixtures compartidos PHP/JS forman parte del contrato.
+
+La compilación valida los operandos numéricos antes de publicar: admite enteros
+JSON y cadenas decimales exactas, y rechaza flotantes JSON, exponentes, booleanos,
+objetos y listas donde corresponde un escalar. `between` exige dos límites
+ordenados. La igualdad y pertenencia conservan la posibilidad de comparar con
+null; las comparaciones ordenadas requieren números. `empty` y `not_empty` no
+requieren un operando numérico.
+
+Los operadores externos pueden declarar `datatypes` para su compatibilidad con
+campos existentes. Compiler y Builder suman esa compatibilidad a la declarada
+por el Field Type; no modifica las capacidades de operadores core. Operadores
+y efectos externos requieren el módulo de navegador versionado de ADR 0015.
+Sus hooks reciben copias y se ejecutan dentro del mismo límite de estabilización;
+un resultado inválido o no convergente deja indisponible esa instancia.

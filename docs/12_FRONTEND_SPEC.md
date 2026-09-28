@@ -1,6 +1,5 @@
 # 12 — Frontend
 
-
 > Proyecto: **Nicode EasyForms**  
 > Estado del documento: **Especificación inicial normativa**  
 > Plataforma objetivo: **Joomla 6.x**  
@@ -8,7 +7,6 @@
 >
 > Convenciones: **MUST/DEBE** = requisito obligatorio; **SHOULD/DEBERÍA** = recomendado salvo causa documentada; **MAY/PUEDE** = opcional.  
 > Todo cambio funcional deberá modificar primero o simultáneamente la especificación correspondiente y sus criterios de aceptación.
-
 
 ## 1. Publicación como página
 
@@ -21,6 +19,14 @@ Parámetro principal:
 - `Formulario`: selector dinámico de formularios utilizables.
 
 El Item de menú almacena el identificador del formulario, no una copia de sus campos.
+
+El selector nativo es compartido por menú y módulo. Muestra formularios publicados
+dentro del permiso administrativo `easyforms.forms.manage`; no expone títulos de
+formularios fuera de ese ámbito. Conserva un ID previamente elegido aunque deje
+de estar disponible y lo indica sin revelar su título. No impone un máximo de
+formularios; recorre las páginas del servicio autorizado. La comprobación de
+publicación, ventanas temporales, idioma y acceso del visitante sigue siendo
+obligatoria en el runtime, independientemente de las opciones del selector.
 
 ## 2. Publicación como módulo
 
@@ -39,6 +45,14 @@ Parámetros secundarios, exclusivamente de contexto/presentación:
 - comportamiento si no está disponible.
 
 El módulo NO puede redefinir reglas, destinatarios, validadores o estructura.
+
+`show_form_title` y `show_description` muestran el nombre y descripción traducidos
+del snapshot publicado; están desactivados por defecto. El título propio del
+módulo conserva el control nativo de Joomla. `form_class` acepta hasta diez nombres
+de clase de 64 caracteres, con letras, números, guion o guion bajo y comienzo no
+numérico; descarta tokens inválidos. `layout` usa los layouts y overrides nativos
+de módulo. `unavailable_mode` elige omitir el contenido (predeterminado) o mostrar
+un mensaje genérico, sin revelar título ni descripción del formulario inaccesible.
 
 ## 3. Form no disponible
 
@@ -73,6 +87,13 @@ Dos instancias del mismo Form pueden coexistir sin:
 - rules cruzadas;
 - CAPTCHA namespace conflictivo;
 - mensajes cruzados.
+
+La inicialización JavaScript se aísla por instancia. Una definición o estructura
+DOM inválida bloquea únicamente ese formulario con un mensaje traducido seguro;
+no impide inicializar los siguientes. Los eventos de actualización de Joomla no
+duplican listeners, incluso cuando el nodo actualizado es el propio formulario.
+Un fallo de reglas durante interacción deshabilita envío y navegación hasta que
+una reevaluación válida permite recuperarlos. No se muestran excepciones internas.
 
 ## 5. Assets
 
@@ -141,3 +162,11 @@ La seguridad y la verdad del estado permanecen en servidor.
 Se definirá qué funcionalidades soportan fallback sin JavaScript.
 
 Los formularios simples deberían poder enviarse; funcionalidades altamente dinámicas podrán requerir JS si la especificación lo declara, pero el sistema nunca confiará en JS para validar.
+
+## Carga de assets tras renderizado
+
+El componente solo activa CSS y JavaScript del runtime cuando obtiene HTML de un
+formulario. Un fallo de renderizado con respuesta 503 y correlación no activa esos
+assets por sí solo. Los módulos sanos de la misma página pueden necesitarlos y
+Joomla Web Asset Manager los incluye una sola vez. Las páginas ajenas sin instancias
+EasyForms no cargan sus assets; los assets administrativos no se activan en frontend.

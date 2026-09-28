@@ -48,6 +48,20 @@ Cada Form podrá personalizar, con fallback global:
 
 No mostrar detalles técnicos al visitante.
 
+`post_submit.messages.success_heading` configura el encabezado de éxito separado
+del cuerpo `success`. Admite los mismos tokens seguros y traducciones por idioma,
+con fallback a la cadena Joomla global; una cadena vacía lo oculta. Solo aparece
+en resultados success, nunca en rechazos, procesamiento pendiente o fallos de
+acciones. Ambos transportes lo presentan como encabezado escapado dentro del
+estado de confirmación; no interpreta HTML.
+
+Las claves de mensajes por formulario deben pertenecer al catálogo de categorías
+configurables compartido con traducciones y el editor. Una clave desconocida o
+mal escrita impide publicar y señala su ruta; no se ignora silenciosamente.
+Las traducciones conservan el fallback por categoría. Los rechazos anteriores a
+la autorización del formulario conservan el mensaje global seguro, sin cargar
+texto privado de una definición a la que el visitante no tiene acceso.
+
 ## 4. Comportamiento de éxito
 
 Opciones:
@@ -61,6 +75,21 @@ Opciones:
 - redirigir a URL autorizada;
 - ir a página/estado de confirmación;
 - entregar identificador/reference code.
+
+El editor permite seleccionar los campos cuyos valores se conservarán después
+de un reset. Excluye passwords, archivos y campos sensibles. Una selección
+importada que ya no sea válida permanece visible para poder retirarla, pero no
+habilita su conservación en el servidor. Las selecciones se guardan por UUID de
+campo; dentro de grupos repetibles se conserva el valor de cada fila por separado.
+
+`post_submit.summary_fields` opta explícitamente por mostrar respuestas concretas
+en la confirmación de éxito. El editor ofrece campos no sensibles y excluye
+contraseñas y archivos; el compilador rechaza referencias ausentes o prohibidas.
+El servidor vuelve a aplicar esas exclusiones al construir el resumen, usando
+valores normalizados y etiquetas traducidas. No incluye contexto técnico ni
+campos inactivos. Las filas repetidas mantienen su orden con etiquetas numeradas,
+sin exponer rutas UUID. El resultado usa texto escapado, también tras ocultar el
+formulario. Por omisión no se muestra un resumen.
 
 ## 5. Redirect
 
@@ -163,6 +192,13 @@ Configurar:
 
 En redirect no aplica salvo persistencia cliente explícita.
 
+El reset restaura los valores iniciales de los campos no conservados. Los campos
+seleccionados conservan también un valor vacío explícito. En grupos repetibles la
+selección se configura por UUID de definición y se aplica a cada dirección de
+campo de forma independiente, manteniendo las filas declaradas y su orden. Un
+reset confirmado obtiene un intento nuevo. Un error de validación no es un reset:
+mantiene los valores enviados, sin reponer un default sobre un campo borrado.
+
 ## 14. Reference code
 
 Puede mostrarse un identificador seguro y no predecible de Submission para soporte.
@@ -210,3 +246,7 @@ Todos los mensajes son traducibles.
 ## 20. Logging
 
 La configuración de mensajes nunca debe provocar que el log guarde contenido personal innecesario.
+
+## 21. Edición de mensajes condicionales
+
+El constructor permite crear condiciones tipadas, mensajes y un orden explícito de prioridad. El primer mensaje coincidente sustituye la confirmación normal únicamente cuando el procesamiento ya no está pendiente ni bloqueado. Cada mensaje nuevo tiene un UUID estable; reordenarlo conserva su traducción. Los snapshots anteriores sin UUID siguen siendo válidos y mantienen su comportamiento. Duplicar o importar como nuevo formulario remapea los UUID de mensajes y sus traducciones junto con las referencias a campos.

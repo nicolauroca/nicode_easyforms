@@ -1,0 +1,43 @@
+import {FormInstance} from './assets/js/form-instance.js';
+const report=document.querySelector('#report'), fixture=JSON.parse(document.querySelector('#fixture').textContent);
+const assert=(value,message)=>{if(!value) throw new Error(message);};
+const main=new FormInstance(document.querySelector('#main')), other=new FormInstance(document.querySelector('#other'));
+const first=fixture.rows[fixture.group][0], added=fixture.added[fixture.group][1];
+const key=(row,field)=>`${fixture.group}/${row}/${field}`;
+const input=main.controls.get(key(first,fixture.name))[0], file=main.controls.get(key(first,fixture.file))[0];
+let release, requests=0, mode='add';
+globalThis.fetch=async(_url,options)=>{
+  requests++; assert(!options.body.toString().includes('selected.txt'),'File bytes/name leaked to row endpoint');
+  assert(options.body.get('attempt')==='unchanged-attempt','Attempt changed');
+  await new Promise(resolve=>{release=resolve;});
+  return mode==='fail' ? {ok:false,json:async()=>({ok:false,error:'rate_limited'})} : {ok:true,json:async()=>({ok:true,form:{html:mode==='add'?fixture.addHtml:fixture.removeHtml}})};
+};
+const settled=async()=>{for(let i=0;i<100 && main.pending;i++) await new Promise(resolve=>setTimeout(resolve,20)); assert(!main.pending,'Operation never settled');};
+try {
+  const transfer=new DataTransfer(); transfer.items.add(new File(['selected bytes'],'selected.txt',{type:'text/plain'})); file.files=transfer.files;
+  input.value='Before request'; input.dispatchEvent(new Event('input',{bubbles:true}));
+  main.form.querySelector('[data-nef-row-change="add"]').click();
+  assert(main.pending && requests===1,'Add did not start once');
+  main.form.querySelector('[data-nef-row-change="add"]').click(); assert(requests===1,'Duplicate row request');
+  input.value='Typed while waiting'; release(); await settled();
+  assert(main.spec.instances[fixture.group].length===2,'Row not added');
+  assert(main.controls.get(key(first,fixture.name))[0]===input && input.value==='Typed while waiting','Existing input replaced or stale value restored');
+  assert(main.controls.get(key(first,fixture.file))[0]===file && file.files[0].name==='selected.txt','File control was lost');
+  assert(document.activeElement===main.controls.get(key(added,fixture.name))[0],'Focus did not enter added row');
+  assert(other.spec.instances[fixture.group].length===1 && other.controls.get(key(first,fixture.name))[0].value==='Initial','Independent form changed');
+  mode='fail'; main.form.querySelector('[data-nef-row-change="remove"]').click(); release(); await settled();
+  assert(main.spec.instances[fixture.group].length===2 && file.files.length===1 && input.value==='Typed while waiting','Rejected edit destroyed inputs');
+  mode='remove'; const button=[...main.form.querySelectorAll('[data-nef-row-change="remove"]')].find(button=>JSON.parse(button.value).row===added);
+  button.click(); release(); await settled();
+  assert(main.spec.instances[fixture.group].length===1 && main.controls.get(key(first,fixture.file))[0]===file && file.files.length===1,'Removal lost sibling file');
+  assert(document.activeElement===input,'Removal focus not recovered');
+  main.form.reset(); main.refresh();
+  assert(JSON.parse(main.form.elements.namedItem('nef_instances').value)[fixture.group].length===1,'Reset restored stale declarations');
+  assert(input.value==='Initial' && file.files.length===0,'Reset did not retain original defaults or clear files');
+  mode='fail'; const submission=main.submit();
+  assert(main.pending && main.form.querySelector('[data-nef-row-change="add"]').disabled,'Submission did not block row edits');
+  release(); await submission;
+  assert(!main.pending && !main.form.querySelector('[data-nef-row-change="add"]').disabled,'Finished submission left row editing disabled');
+  report.textContent='PASS — añadir/quitar, archivos originales, escritura durante espera, foco, doble clic, error recuperable, reset e independencia de formularios.';
+  report.dataset.passed='true';
+} catch(error) { report.textContent='FAIL — '+error.message; report.dataset.passed='false'; }

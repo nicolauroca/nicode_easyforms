@@ -77,3 +77,13 @@ Requieren:
 ## 7. Release reproducible
 
 El repositorio deberá definir cómo construir el package final a partir de source, assets y manifests.
+
+## Auditoría del artefacto de desarrollo
+
+El build de integración fija orden y fechas de entradas ZIP y verifica después
+membresía exacta, contenido SHA-256, licencia, versiones coherentes de extensiones
+y bytes de los paquetes anidados. Genera un inventario build-manifest.json con
+release=false. La prueba de reproducibilidad exige dos builds idénticos en el
+mismo entorno y rechaza archivos adicionales, alterados o ausentes en copias.
+La igualdad entre toolchains distintos sigue requiriendo verificación específica;
+esta prueba no habilita una release mientras queden gates de producto abiertos.

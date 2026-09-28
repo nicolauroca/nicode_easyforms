@@ -1,0 +1,2 @@
+# Preserve the exact source bytes used by release archives and document hashes.
+* -text

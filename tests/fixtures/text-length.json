@@ -1,0 +1,9 @@
+[
+  {"value":"😀","config":{"min_length":1,"max_length":1},"errors":[]},
+  {"value":"😀😀","config":{"max_length":1},"errors":["max_length"]},
+  {"value":"😀","config":{"min_length":2},"errors":["min_length"]},
+  {"value":"ñ","config":{"max_length":1},"errors":[]},
+  {"value":"ñ","config":{"max_length":1},"errors":["max_length"]},
+  {"value":"👨‍👩‍👧‍👦","config":{"min_length":7,"max_length":7},"errors":[]},
+  {"value":"a\nb","config":{"min_length":3,"max_length":3},"errors":[]}
+]

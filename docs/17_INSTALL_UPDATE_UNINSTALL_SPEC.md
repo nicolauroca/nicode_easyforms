@@ -21,8 +21,17 @@ Constituyentes iniciales:
 - `com_nicode_easy_forms`;
 - `mod_nicode_easy_forms`;
 - `lib_nicode_easy_forms`.
+- `plg_task_nicode_easy_forms`, para el ejecutor de jobs nativo.
+- `plg_extension_nicode_easy_forms`, para auditar guardados de configuración
+  nativa; habilitado al instalar y con estado respetado en actualizaciones.
 
 Las dependencias internas deberán quedar declaradas.
+
+El preflight del package se ejecuta antes de modificar piezas hijas. Comprueba
+Joomla 6+, PHP 8.3+, extensiones mbstring/intl/bcmath/fileinfo/curl/zip y soporte
+de leases SQL con MySQL 8.0.13+, MariaDB 10.6+ o PostgreSQL 14+ (ADR-0006). Estos mínimos
+son requisitos de instalación; la matriz de versiones efectivamente probadas
+se documenta por separado y no se infiere de esta validación.
 
 ## 2. Instalación
 
@@ -105,6 +114,12 @@ Conservar:
 
 Una reinstalación debe detectar datos conservados.
 
+El modo predeterminado es conservación. El script nativo guarda los parámetros,
+la versión de schema y las reglas ACL antes de que Joomla retire sus assets. Al
+reinstalar restaura los assets por nombre y actualiza sus IDs, preservando reglas
+de denegación y formularios previamente huérfanos. No depende de la library
+durante la desinstalación. Véase ADR-0010.
+
 ## 8. Almacenamiento externo
 
 No borrar automáticamente objetos externos que no sean inequívocamente propiedad del package.
@@ -124,3 +139,19 @@ Antes de un purge destructivo, Joomla debe mostrar información suficiente sobre
 - irreversibilidad.
 
 La confirmación final se implementará conforme a capacidades Joomla.
+
+## 11. Preparación de purga
+
+El modo purge se activa mediante una revisión y confirmación explícitas en la
+administración, no mediante una opción destructiva predeterminada. La preparación
+bloquea admisiones y escrituras ordinarias, elimina formularios por jobs acotados
+y espera la limpieza física de objetos y exportaciones. Sólo entonces habilita
+la desinstalación nativa del package. El preflight comprueba de nuevo el estado
+antes de retirar cualquier hijo. Un fallo conserva los registros necesarios
+para reanudar; nunca se borra una outbox pendiente. Véase ADR-0012.
+
+La preparación de purga usa el bloqueo exclusivo del checkpoint de schema para
+esperar a escritores de uploads activos. Transfiere también reservas interrumpidas
+a jobs de limpieza y no permite desinstalar antes de completarlos (ADR 0013).
+Una reserva previa no autoriza escribir después de activar la purga. La pantalla
+de confirmación incluye la cantidad de subidas pendientes de asociación/limpieza.

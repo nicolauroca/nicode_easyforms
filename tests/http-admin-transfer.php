@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+$transferPackage = $api('definition.export', query: ['id' => $id, 'mode' => 'portable']);
+$assert($transferPackage['format'] === 'nicode.easyforms.definition' && !isset($transferPackage['definition']['submissions']), 'Definition export format or scope failed.');
+$transferJson = json_encode($transferPackage, JSON_THROW_ON_ERROR);
+$transferChoices = ['policy' => 'duplicate', 'name' => 'HTTP imported definition', 'alias' => 'http-import-' . bin2hex(random_bytes(6)), 'revision' => 0];
+$transferPayload = ['document' => $transferJson, 'choices' => $transferChoices];
+$api('definition.preview', expected: 405);
+$api('definition.preview', $transferPayload, expected: 403, csrf: false);
+$transferPreview = $api('definition.preview', $transferPayload);
+$assert($transferPreview['can_import_draft'] && $transferPreview['identity_remap'], 'Transfer preview did not allow a duplicate draft.');
+$transferCommit = $transferPayload + ['review_token' => $transferPreview['review_token'], 'acknowledge_review' => true];
+$wrongTransfer = $transferCommit; $wrongTransfer['choices']['name'] = 'Changed after preview';
+$api('definition.import', $wrongTransfer, expected: 403);
+$transferCopy = $api('definition.import', $transferCommit);
+$transferRecord = $api('record', query: ['id' => $transferCopy['id']]);
+$assert($transferRecord['form']['state'] === 'draft' && $transferRecord['form']['published_version_id'] === null && $transferRecord['draft']['uuid'] !== $transferPackage['definition']['uuid'], 'Native import activated a form or failed to remap identity.');
+$transferEditor = $request($base . '?option=com_nicode_easy_forms&view=editor&id=' . $transferCopy['id']);
+$assert(str_contains($transferEditor['body'], 'data-nef-transfer="export"') && str_contains($transferEditor['body'], 'data-nef-transfer="import"'), 'Definition transfer editor controls missing.');
+$badTransfer = $transferPayload; $badTransfer['document'] = '{"format":"unknown"}'; $api('definition.preview', $badTransfer, expected: 422);
+file_put_contents($root . '/build/admin-transfer-results.json', json_encode(['passed' => true, 'timestamp' => gmdate(DATE_ATOM), 'source_id' => $id, 'import_id' => $transferCopy['id'], 'checks' => ['versioned export', 'POST and CSRF', 'preview', 'altered review rejected', 'draft import with new identity', 'native editor controls', 'invalid format rejected']], JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+echo "Native definition transfer HTTP: export, protected preview, signed import, draft identity and editor controls passed.\n";

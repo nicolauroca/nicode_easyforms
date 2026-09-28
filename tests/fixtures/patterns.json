@@ -1,0 +1,18 @@
+[
+  {"pattern":"[A-Z]{2}[0-9]{3}","valid":true,"value":"AB123","matches":true},
+  {"pattern":"[A-Z]{2}[0-9]{3}","valid":true,"value":"AB123\n","matches":false},
+  {"pattern":"\\w+","valid":true,"value":"España","matches":false},
+  {"pattern":"\\d+","valid":true,"value":"١٢٣","matches":false},
+  {"pattern":"\\s+","valid":true,"value":" \n","matches":true},
+  {"pattern":"[a-z]+","valid":true,"value":"abc","matches":true},
+  {"pattern":"a*a*a*a*a*","valid":false},
+  {"pattern":"a{1,20}a{1,20}","valid":false},
+  {"pattern":"a{1000000000}","valid":false},
+  {"pattern":"[\\d]+","valid":false},
+  {"pattern":"(a+)+","valid":false},
+  {"pattern":"(?=a)","valid":false},
+  {"pattern":"a++","valid":false},
+  {"pattern":"a|b","valid":false},
+  {"pattern":"a\\-b","valid":true,"value":"a-b","matches":true},
+  {"pattern":"[a\\-b]+","valid":true,"value":"a-b","matches":true}
+]

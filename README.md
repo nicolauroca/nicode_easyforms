@@ -16,19 +16,17 @@ The runtime provides the capabilities.
 
 ## Project status
 
-> **Under active development — pre-1.0**
+> **1.0.0 — initial stable package**
 
 Nicode EasyForms is being developed in public from day one.
 
 The architecture and product behaviour are defined through a comprehensive specification located in [`/docs`](./docs/README.md). Implementation is expected to follow those specifications rather than allowing the codebase to become the de facto product definition.
 
-Until the first stable release is published:
-
-* APIs may evolve;
-* database migrations may change;
-* package structure may change;
-* development branches may contain incomplete functionality;
-* production use is not recommended unless explicitly stated in a release.
+Install [the 1.0.0 package](dist/pkg_nicode_easy_forms-1.0.0.zip) through Joomla's
+extension installer. Read the [administration guide](docs/ADMIN_USER_GUIDE.md),
+[build instructions](docs/BUILD_AND_RELEASE.md) and
+[acceptance record](docs/REQUIREMENT_ACCEPTANCE.md). Accessibility was accepted
+explicitly by the user; the outstanding manual screen-reader check was waived.
 
 The project is intentionally public during development to keep architectural decisions, implementation progress and technical trade-offs visible.
 

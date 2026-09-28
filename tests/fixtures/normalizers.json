@@ -1,0 +1,21 @@
+[
+  {"type":"select","datatype":"selection","raw":" a ","expected":" a "},
+  {"type":"radio","datatype":"selection","raw":"01","expected":"01"},
+  {"type":"button-group","datatype":"selection","raw":"\tvalue\t","expected":"\tvalue\t"},
+  {"type":"text","datatype":"text","raw":" \tanswer\r\n","expected":"answer"},
+  {"type":"text","datatype":"text","raw":"\u00a0answer\u00a0","expected":"\u00a0answer\u00a0"},
+  {"type":"password","datatype":"text","raw":" secret ","expected":" secret "},
+  {"type":"text","datatype":"text","raw":{"nested":"bad"},"error":true},
+  {"type":"checkbox","datatype":"boolean","raw":"on","expected":true},
+  {"type":"checkbox","datatype":"boolean","raw":"off","expected":false},
+  {"type":"checkbox","datatype":"boolean","raw":null,"expected":null},
+  {"type":"checkbox","datatype":"boolean","raw":"yes","error":true},
+  {"type":"multiselect","datatype":"selection","raw":[1,"1",2],"expected":["1","2"]},
+  {"type":"multiselect","datatype":"selection","raw":[["bad"]],"error":true},
+  {"type":"decimal","datatype":"decimal","raw":"-00012.3400","expected":"-12.34"},
+  {"type":"decimal","datatype":"decimal","raw":"1e3","error":true},
+  {"type":"decimal","datatype":"decimal","raw":"\u00a01.2\u00a0","error":true},
+  {"type":"integer","datatype":"integer","raw":"9223372036854775807","expected":"9223372036854775807"},
+  {"type":"integer","datatype":"integer","raw":"9223372036854775808","error":true},
+  {"type":"integer","datatype":"integer","raw":"12.5","error":true}
+]

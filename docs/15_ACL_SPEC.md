@@ -37,7 +37,11 @@ Permisos específicos propuestos:
 - `easyforms.logs.view`;
 - `easyforms.jobs.manage`.
 
-Los nombres definitivos se fijarán antes de código.
+Los nombres anteriores se fijan como identificadores definitivos. Se añaden
+`easyforms.submissions.anonymize`, `easyforms.submissions.reindex` y
+`easyforms.submissions.retry` para separar operaciones privilegiadas.
+`Security/Permissions.php` enumera el contrato y `tools/acl.php` genera `access.xml`.
+Un Form sin asset hijo válido no concede permisos administrativos por fallback.
 
 ## 2. ACL por Form
 
@@ -66,7 +70,32 @@ Comprobar en:
 
 Cada Controller comprueba autorización.
 
+Los servicios de administración de Forms exigen `core.manage` en el componente y
+`easyforms.forms.manage` sobre el Form, además de la capacidad concreta:
+`core.edit` para borradores e histórico; `easyforms.forms.publish` y
+`core.edit.state` para publicación/desactivación; `core.delete` adicional para
+enviar a papelera. Crear exige las capacidades de gestión y `core.create` en
+el componente. La creación del asset y el guardado se confirman en la misma
+transacción; un fallo del asset no puede dejar cambios parciales.
+
 La View puede ocultar acciones no permitidas, pero eso es UX, no seguridad.
+
+Modificar reglas ACL por Form exige además `core.admin` en el componente. La
+operación modifica permisos de un grupo Joomla existente, conserva las reglas
+de los demás grupos, consume la revisión optimista del Form y comprueba una huella
+de las reglas del asset. Una modificación concurrente realizada fuera de EasyForms
+también debe provocar conflicto, aunque no haya cambiado la revisión del Form.
+El estado heredado se calcula mediante ACL Joomla; no se simula en JavaScript.
+
+
+
+Consultar respuestas exige core.manage en el componente y easyforms.submissions.view
+en cada Form; no exige gestión ni edición de Forms. El scope de búsqueda se
+construye exclusivamente con assets y ACL del servidor. Añadir notas o cambiar
+estado exige además easyforms.submissions.manage. El historial de auditoría
+requiere easyforms.logs.view. Mostrar valores sensibles y descargar archivos
+sensibles comprueba view_sensitive sobre el Form; la revelación es explícita,
+mediante POST con CSRF y auditoría, y no se activa mediante parámetros GET.
 
 ## 5. Datos sensibles
 

@@ -96,6 +96,18 @@ Ocultar botones no sustituye autorización.
 - download controller con ACL;
 - optional malware scanner provider futuro.
 
+La descarga de un archivo cuyo proveedor de almacenamiento ya no esté registrado
+o cuyo objeto físico falte devuelve el mismo rechazo genérico de archivo no
+disponible (404), sin ruta privada, identificador del proveedor ni cabeceras de
+adjunto. No registra una descarga exitosa ni modifica su propiedad persistida.
+Restaurar el proveedor u objeto permite recuperar el acceso sujeto a la ACL vigente.
+
+La descarga de un archivo cuyo proveedor de almacenamiento ya no esté registrado
+o cuyo objeto físico falte devuelve el mismo rechazo genérico de archivo no
+disponible (404), sin ruta privada, identificador del proveedor ni cabeceras de
+adjunto. No registra una descarga exitosa ni modifica su propiedad persistida.
+Restaurar el proveedor u objeto permite recuperar el acceso sujeto a la ACL vigente.
+
 ## 9. Email
 
 - sender configurado;
@@ -119,6 +131,13 @@ Mitigación SSRF:
 ## 11. Exports
 
 CSV debe mitigar formula injection para valores que comienzan con caracteres peligrosos según política de exportación.
+
+La política del exportador CSV antepone un apóstrofo a toda celda cuyo primer
+carácter sea `=`, `+`, `-`, `@`, un control o espacio ASCII (U+0000–U+0020),
+o el BOM U+FEFF. Se aplica también a las etiquetas de encabezado. La escritura
+CSV entrecomilla y escapa comas, comillas y saltos de línea, manteniendo cada
+valor en su celda. Esta transformación pertenece exclusivamente al archivo CSV:
+no modifica la respuesta canónica ni los valores de la exportación JSON.
 
 Las exportaciones respetan ACL y datos sensibles.
 
@@ -145,3 +164,14 @@ No registrar por defecto:
 ## 15. Security headers
 
 EasyForms no debe romper CSP u otras políticas del sitio mediante inline JS innecesario. Assets y scripts deben diseñarse para integrarse con la política del sitio.
+
+### Ventanas y caducidad del limiter
+
+La política publicada configura un máximo de intentos y una ventana fija. El
+scope combina el formulario y un HMAC de la dirección de transporte validada;
+no se confía en cabeceras Forwarded sin una política de proxy. Si no hay dirección
+válida se usa el vínculo de sesión. No se guarda la dirección en claro. La consulta
+de opciones usa un scope separado. El rechazo HTTP es 429 con Retry-After positivo.
+La tarea horaria `rate-limit-cleanup` elimina sólo ventanas caducadas en lotes
+transaccionales; nunca reinicia contadores activos. Una cola detenida retrasa esa
+eliminación y debe detectarse mediante el estado del scheduler/jobs.

@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "sha256": "0de80b3af6a39e2cc9e20621e2812450c03f97ad0b59f49a2ce2976394df9614",
+  "requirements_complete": 133,
+  "requirements_remaining": 0,
+  "product_steps": 40,
+  "native_preserve_reinstall": true,
+  "native_clean_reinstall": true,
+  "accessibility": "Explicit user acceptance; manual screen-reader check waived, not executed",
+  "evidence": "docs/REQUIREMENT_ACCEPTANCE.md"
+}

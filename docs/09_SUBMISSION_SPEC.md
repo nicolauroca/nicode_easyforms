@@ -49,6 +49,13 @@ Cada formulario podrá definir:
 
 El valor predeterminado del producto se definirá en configuración global y podrá sobrescribirse por Form.
 
+La opción global `default_persistence` admite full (predeterminado), metadata y
+none. Se copia al borrador al crear un formulario. Cambiarla no modifica borradores
+existentes ni versiones publicadas; cada formulario conserva su elección explícita
+y el editor permite cambiarla antes de publicar una nueva versión. Duplicaciones
+e importaciones conservan la política de la definición copiada. Un valor global
+inválido se rechaza, sin convertirlo silenciosamente en almacenamiento completo.
+
 ## 4. Submission canónica
 
 Cuando se almacene, debe preservar:
@@ -81,6 +88,20 @@ Ambos modos usarán el mismo pipeline.
 
 AJAX solo cambia el transporte/presentación de la respuesta.
 
+Un rechazo conocido del servidor debe mostrar su mensaje localizado también en
+AJAX (por ejemplo, sesión caducada o límite de frecuencia). No debe convertirse
+en un error genérico de red. El cliente conserva los valores y el attempt para
+permitir la recuperación; solo un envío aceptado aplica reset, hide, redirect o
+next_attempt. Una respuesta ilegible o un fallo de transporte mantiene el mensaje
+de resultado no confirmado.
+
+Un rechazo conocido del servidor debe mostrar su mensaje localizado también en
+AJAX (por ejemplo, sesión caducada o límite de frecuencia). No debe convertirse
+en un error genérico de red. El cliente conserva los valores y el attempt para
+permitir la recuperación; solo un envío aceptado aplica reset, hide, redirect o
+next_attempt. Una respuesta ilegible o un fallo de transporte mantiene el mensaje
+de resultado no confirmado.
+
 ## 7. Estado y Action status
 
 El éxito de persistencia y el éxito de las Actions son dimensiones diferentes.
@@ -98,6 +119,11 @@ La UI debe representar esa diferencia.
 El POST siempre vuelve a comprobar estado y permisos.
 
 Haber renderizado anteriormente un formulario no concede derecho perpetuo a enviarlo.
+
+Una cuenta bloqueada no recibe niveles de acceso para formularios, aunque su
+sesión Joomla siga abierta. El contexto vuelve a consultar la identidad vigente
+y el POST rechaza el formulario antes de persistir. La misma restricción se
+aplica al renderizado y a los servicios públicos que reutilizan ese contexto.
 
 ## 9. Límites
 
@@ -120,3 +146,14 @@ Se registrará de forma controlada si la submission vino de:
 - API futura.
 
 Nunca se confiará en un channel enviado libremente por el navegador sin validación.
+
+## Límites de tamaño del transporte
+
+Si Content-Length supera el post_max_size efectivo de PHP, el controlador rechaza
+el envío antes del pipeline con HTTP 413 y request_too_large. El mensaje indica
+que la respuesta no se guardó y propone reducir archivos/texto o contactar con la
+administración. No expone límites internos ni datos enviados. El envío mejorado
+recibe JSON según su cabecera Accept aunque PHP haya descartado el campo format;
+el envío ordinario recibe HTML. La comprobación de tamaño no autoriza la petición
+ni sustituye CSRF. Los recortes por variables o partes sin evidencia suficiente
+para clasificarlos conservan el rechazo de sesión y no persisten datos.
